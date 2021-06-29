@@ -76,6 +76,14 @@ setup_qemu() {
 }
 
 get_image() {
+  img=""
+
+  img=$(ls /root/image 2>/dev/null)
+  [[ -z "$img" ]] || {
+    echo "$img exist"
+    return 0
+  }
+
   echo "Get the image"
   cd /root/
   wget http://xpf-desktop.sh.intel.com/syzkaller/image.tar.gz
