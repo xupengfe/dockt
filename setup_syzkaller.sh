@@ -30,7 +30,7 @@ install_docker() {
   yum install -y docker-ce docker-ce-cli containerd.io --allowerasing
 
   echo "systemctl restart docker"
-  systemctl restart docker
+  systemctl start docker
   systemctl enable docker
 }
 
