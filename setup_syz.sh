@@ -53,6 +53,7 @@ install_packages() {
   yum -y install SDL2-devel.x86_64
   yum -y install  bridge-utils.x86_64
   yum -y install debootstrap.noarch
+  yum -y install glibc.i686 --allowerasing
 }
 
 setup_qemu() {
