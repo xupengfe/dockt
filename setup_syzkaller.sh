@@ -31,6 +31,7 @@ install_docker() {
 
   echo "systemctl restart docker"
   systemctl restart docker
+  systemctl enable docker
 }
 
 check_docker() {
