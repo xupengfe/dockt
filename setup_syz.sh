@@ -116,6 +116,18 @@ install_syzkaller() {
   }
 }
 
+install_vncserver() {
+
+  echo "systemctl stop firewalld.service"
+  systemctl stop firewalld.service
+  echo "systemctl disable firewalld.service"
+  systemctl disable firewalld.service
+
+  yum install -y tigervnc-server
+  echo "vncpasswd"
+  echo "vncserver"
+}
+
 next_to_do() {
   echo "cd /root/image"
   echo "syz-manager --config my.cfg"
@@ -126,6 +138,7 @@ main() {
   setup_qemu
   get_image
   install_syzkaller
+  install_vncserver
   next_to_do
 }
 
