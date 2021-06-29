@@ -68,6 +68,7 @@ setup_qemu() {
   cd /root/
   git clone https://github.com/qemu/qemu.git
   cd qemu
+  git checkout -f v6.0.0
   mkdir build
   cd build
   yum install -y ninja-build.x86_64
@@ -79,7 +80,7 @@ setup_qemu() {
 get_image() {
   img=""
 
-  img=$(ls /root/image 2>/dev/null)
+  img=$(ls /root/image/start2.sh 2>/dev/null)
   [[ -z "$img" ]] || {
     echo "$img exist"
     return 0
