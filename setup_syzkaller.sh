@@ -1,7 +1,7 @@
 #!/bin/bash
 
 install_docker() {
-  echo "***no reald docker, will install real docker.***"
+  echo "***no real docker, will install real docker.***"
   export https_proxy=http://child-prc.intel.com:913
   export http_proxy=http://child-prc.intel.com:913
   export all_proxy=http://child-prc.intel.com:913
@@ -42,6 +42,12 @@ check_docker() {
 }
 
 setup_syzkaller() {
+  image="image"
+
+  [[ -f "$image" ]] || {
+    echo "$image is already exist"
+    return 0
+  }
   echo "Get the image"
   wget http://xpf-desktop.sh.intel.com/syzkaller/image.tar.gz
   tar -xvf image.tar.gz
