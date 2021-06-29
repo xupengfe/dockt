@@ -110,9 +110,9 @@ install_syzkaller() {
   make
   check_env=$(cat /root/.bashrc | grep syzkaller)
   [[ -n "$check_env" ]] || {
-    echo "export PATH=/root/syzkaller/bin:$PATH" >> $bashrc
-    echo "export PATH=/root/syzkaller/bin/linux_amd64:$PATH" >> $bashrc
-    echo "export PATH=/usr/local/bin:$PATH" >> $bachrc
+    echo "export PATH=/root/syzkaller/bin:\$PATH" >> $bashrc
+    echo "export PATH=/root/syzkaller/bin/linux_amd64:\$PATH" >> $bashrc
+    echo "export PATH=/usr/local/bin:\$PATH" >> $bashrc
     sudo bash
   }
 }
