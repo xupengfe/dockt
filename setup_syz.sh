@@ -118,7 +118,6 @@ install_syzkaller() {
 }
 
 install_vncserver() {
-
   echo "systemctl stop firewalld.service"
   systemctl stop firewalld.service
   echo "systemctl disable firewalld.service"
