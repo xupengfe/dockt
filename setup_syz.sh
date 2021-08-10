@@ -1,7 +1,9 @@
 #!/bin/bash
 
+syzkaller_log="/tmp/syzkaller_setup"
 
 install_packages() {
+  cat /dev/null > $syzkaller_log
   echo "Install useful packages:"
   yum -y install glibc-devel.i686 glibc-devel
   yum -y install gcc-c++
@@ -129,6 +131,8 @@ install_vncserver() {
 }
 
 next_to_do() {
+  echo "Install syzkaller environment successfully. Next follow below to run syzkaller:"
+  echo "$(date): The syzkaller environment has been set up successfully" > "$syzkaller_log"
   echo "cd /root/image"
   echo "syz-manager --config my.cfg"
 }
