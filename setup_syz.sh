@@ -138,7 +138,7 @@ get_image() {
 
   img=$(ls "$IMAGE" 2>/dev/null)
   [[ -z "$img" ]] || {
-    echo "$img exist"
+    echo "$img exist, don't need to get image again"
     return 0
   }
 
