@@ -1,7 +1,7 @@
 #!/bin/bash
 
 syzkaller_log="/tmp/syzkaller_setup"
-IMAGE:="/root/image/centos8.img"
+IMAGE="/root/image/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
 
 usage(){
@@ -83,8 +83,8 @@ setup_qemu() {
   local qemu_o="qemu"
   local qemu_i="virtualization.hypervisors.server.vmm.qemu-next"
 
-  [[ "$FORCE" -eq 1 ]] {
-    echo "FORCE set to 1, will reinstall"
+  [[ "$FORCE" -eq 1 ]] && {
+    echo "FORCE:$FORCE set to 1, will reinstall"
     qemu=$(which qemu-system-x86_64)
     echo " rm -rf $qemu"
     rm -rf "$qemu"
