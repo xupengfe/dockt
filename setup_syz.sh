@@ -7,9 +7,9 @@ QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.serve
 usage() {
   cat <<__EOF
   usage: ./${0##*/} [-s o|i] [-f [0|1] [-i 0|1] [-h]
-  -s  Source: o means official, i means intel-next
-  -f  Force: 0 will not reinstall if exist, 1 means will reinstall
-  -i  Ignore:0 will fully installation, 1 ignore rpm and image installation
+  -s  Source: o means official, i means intel-next (default i)
+  -f  Force: 0 will not reinstall if exist, 1 means will reinstall(default 0)
+  -i  Ignore:0 will fully installation, 1 ignore rpm and image installation(default 0)
   -h  Help
 __EOF
   exit 2
