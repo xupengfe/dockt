@@ -8,7 +8,7 @@ usage() {
   cat <<__EOF
   usage: ./${0##*/} [-s o|i] [-f [0|1] [-i 0|1] [-h]
   -s  Source: o means official, i means intel-next (default i)
-  -f  Force: 0 will not reinstall if exist, 1 means will reinstall(default 0)
+  -f  Force: 0 no reinstall if exist, 1 reinstall image (default 0)
   -i  Ignore:0 will fully installation, 1 ignore rpm and image installation(default 0)
   -h  Help
 __EOF
@@ -82,29 +82,34 @@ setup_qemu() {
   local qemu=""
   local qemu_o="qemu"
   local qemu_i="virtualization.hypervisors.server.vmm.qemu-next"
-
-  [[ "$FORCE" -eq 1 ]] && {
-    echo "FORCE:$FORCE set to 1, will reinstall"
-    qemu=$(which qemu-system-x86_64)
-    echo " rm -rf $qemu"
-    rm -rf "$qemu"
-    qemu=""
-  }
+  local result=""
 
   qemu=$(which qemu-system-x86_64)
   [[ -z "$qemu" ]] || {
-    echo "$qemu exist and FORCE:$FORCE, no need reinstall"
-    return 0
+    echo "$qemu exist"
+    result=1
   }
 
   cd /root/
 
   if [[ "$SOURCE" == 'o' ]]; then
+    [[ -d "$qemu_o" ]] && [[ "$result" -eq 1 ]] && {
+      echo "$qemu_o amd $qemu folder exist, no need to install"
+      return 0
+    }
+    echo "rm -rf $qemu_o"
     rm -rf $qemu_o
     git clone https://github.com/qemu/qemu.git
     cd $qemu_o
     git checkout -f v6.0.0
+    # delete intel qemu next to remind it's qemu official version
+    rm -rf /root/$qemu_i
   elif [[ "$SOURCE" == 'i' ]]; then
+    [[ -d "$qemu_i" ]] && [[ "$result" -eq 1 ]] && {
+      echo "$qemu_i amd $qemu folder exist, no need to install"
+      return 0
+    }
+    echo "rm -rf $qemu_i"
     rm -rf $qemu_i
     git clone $QEMU_NEXT
     [[ $? -ne 0 ]] && {
@@ -115,6 +120,8 @@ setup_qemu() {
     }
     cd $qemu_i
     git checkout -f origin/spr-beta
+    # delete official to remind it's intel qemu next version
+    rm -rf /root/qemu_o
   else
     echo "Invalid SOURCE:$SOURCE, do nothing for qemu"
     return 1
@@ -134,6 +141,12 @@ get_image() {
   [[ "$IGNORE" -eq 1 ]] && {
     echo "IGNORE:$IGNORE is 1, will ignore image installation"
     return 0
+  }
+
+  [[ "$FORCE" -eq 1 ]] && {
+    echo "FORCE:$FORCE set to 1, will reinstall image"
+    echo " rm -rf $IMAGE"
+    rm -rf "$IMAGE"
   }
 
   img=$(ls "$IMAGE" 2>/dev/null)
