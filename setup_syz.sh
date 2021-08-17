@@ -4,7 +4,7 @@ syzkaller_log="/tmp/syzkaller_setup"
 IMAGE="/root/image/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
 
-usage(){
+usage() {
   cat <<__EOF
   usage: ./${0##*/} [-s o|i] [-f [0|1] [-i 0|1] [-h]
   -s  Source: o means official, i means intel-next
@@ -206,7 +206,7 @@ main() {
 # Set detault value
 : "${SOURCE:=i}"
 : "${IGNORE:=0}"
-: "${FORCE:=0}
+: "${FORCE:=0}"
 while getopts :s:f:i:h arg; do
   case $arg in
     s)
