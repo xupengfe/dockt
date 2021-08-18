@@ -16,15 +16,15 @@ __EOF
   exit 2
 }
 
-clean_old_setup() {
+check_syzkaller() {
   old_pid=""
 
-  old_pid=$(ps -ef | grep SCREEN | grep setup_syz.sh | awk -F " " '{print $2}')
+  old_pid=$(ps -ef | grep syz-manager | grep config | awk -F " " '{print $2}')
   if [[ -z "$old_pid" ]]; then
-    echo "No old setup_syz.sh" >> "$syzkaller_log"
+    echo "No syzkaller pid run" >> "$syzkaller_log"
   else
-    echo "kill old setup_syz.sh pid $old_pid" >> "$syzkaller_log"
-    kill -9 $old_pid
+    echo "Syzkaller pid $old_pid already run, no need set up, exit" >> "$syzkaller_log"
+    exit 0
   fi
 }
 
@@ -36,7 +36,7 @@ get_repo() {
 
 
   date +%Y-%m-%d_%H:%M:%S >> $syzkaller_log
-  clean_old_setup
+  check_syzkaller
   yum install -y git
 
   if [[ -d "$dockt" ]]; then
