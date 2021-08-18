@@ -40,7 +40,9 @@ get_repo() {
   yum install -y git
 
   if [[ -d "$dockt" ]]; then
-    echo "$dockt is already exist" >> $syzkaller_log
+    echo "$dockt is already exist, will update it" >> $syzkaller_log
+    cd $dockt
+    git pull
   else
     cd /root
     echo "git clone $dockt_git" >> $syzkaller_log
@@ -49,6 +51,8 @@ get_repo() {
 
   if [[ -d "$bz" ]]; then
     echo "$bz is already exist" >> $syzkaller_log
+    cd $bz
+    git pull
   else
     cd /root
     echo "git clone $bz_git" >> $syzkaller_log
