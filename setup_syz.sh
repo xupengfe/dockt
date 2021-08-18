@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export PATH=${PATH}:/root/dockt
-syzkaller_log="/tmp/syzkaller_setup"
+syzkaller_log="/tmp/setup_syzkaller"
 IMAGE="/root/image/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
 
@@ -16,6 +16,18 @@ __EOF
   exit 2
 }
 
+clean_old_setup() {
+  old_pid=""
+
+  old_pid=$(ps -ef | grep SCREEN | grep setup_syz.sh | awk -F " " '{print $2}')
+  if [[ -z "$old_pid" ]]; then
+    echo "No old setup_syz.sh" >> "$syzkaller_log"
+  else
+    echo "kill old setup_syz.sh pid $old_pid" >> "$syzkaller_log"
+    kill -9 $old_pid
+  fi
+}
+
 get_repo() {
   local dockt="/root/dockt"
   local dockt_git="https://github.com/xupengfe/dockt.git"
@@ -24,6 +36,7 @@ get_repo() {
 
 
   date +%Y-%m-%d_%H:%M:%S >> $syzkaller_log
+  clean_old_setup
   yum install -y git
 
   if [[ -d "$dockt" ]]; then
