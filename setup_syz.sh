@@ -120,7 +120,7 @@ setup_qemu() {
   cd /root/
 
   if [[ "$SOURCE" == 'o' ]]; then
-    [[ -d "$qemu_o" ]] && [[ "$result" -eq 1 ]] && {
+    [[ -d "/root/$qemu_o" ]] && [[ "$result" -eq 1 ]] && {
       echo "$qemu_o amd $qemu folder exist, no need to install"
       return 0
     }
@@ -132,7 +132,7 @@ setup_qemu() {
     # delete intel qemu next to remind it's qemu official version
     rm -rf /root/$qemu_i
   elif [[ "$SOURCE" == 'i' ]]; then
-    [[ -d "$qemu_i" ]] && [[ "$result" -eq 1 ]] && {
+    [[ -d "/root/$qemu_i" ]] && [[ "$result" -eq 1 ]] && {
       echo "$qemu_i amd $qemu folder exist, no need to install"
       return 0
     }
