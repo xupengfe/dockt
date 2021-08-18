@@ -237,8 +237,8 @@ next_to_do() {
 
 main() {
   get_repo
-  setup_qemu
   install_packages
+  setup_qemu
   get_image
   install_syzkaller
   install_vncserver
