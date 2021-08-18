@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export PATH=${PATH}:/root/dockt
 syzkaller_log="/tmp/syzkaller_setup"
 IMAGE="/root/image/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
@@ -15,13 +16,39 @@ __EOF
   exit 2
 }
 
+get_repo() {
+  local dockt="/root/dockt"
+  local dockt_git="https://github.com/xupengfe/dockt.git"
+  local bz="/root/bzimage_bisect"
+  local bz_git="https://github.com/xupengfe/bzimage_bisect.git"
+
+
+  date +%Y-%m-%d_%H:%M:%S >> $syzkaller_log
+  yum install -y git
+
+  if [[ -d "$dockt" ]]; then
+    echo "$dockt is already exist" >> $syzkaller_log
+  else
+    cd /root
+    echo "git clone $dockt_git" >> $syzkaller_log
+    git clone "$dockt_git"
+  fi
+
+  if [[ -d "$bz" ]]; then
+    echo "$bz is already exist" >> $syzkaller_log
+  else
+    cd /root
+    echo "git clone $bz_git" >> $syzkaller_log
+    git clone "$bz_git"
+  fi
+}
+
 install_packages() {
   [[ "$IGNORE" -eq 1 ]] && {
     echo "IGNORE:$IGNORE is 1, will ignore rpm installation"
     return 0
   }
 
-  cat /dev/null > $syzkaller_log
   echo "Install useful packages:"
   yum -y install glibc-devel.i686 glibc-devel
   yum -y install gcc-c++
@@ -114,7 +141,7 @@ setup_qemu() {
     git clone $QEMU_NEXT
     [[ $? -ne 0 ]] && {
       echo "Could not get $QEMU_NEXT, please 'dt setup'!!!!"
-      echo "Could not get $QEMU_NEXT, please 'dt setup'!!!!" > $syzkaller_log
+      echo "Could not get $QEMU_NEXT, please 'dt setup'!!!!" >> $syzkaller_log
       echo "Check $syzkaller_log"
       exit 1
     }
@@ -201,12 +228,15 @@ install_vncserver() {
 next_to_do() {
   echo "Set up log: $syzkaller_log"
   echo "Install syzkaller environment successfully. Next follow below to run syzkaller:"
-  echo "$(date): The syzkaller environment has been set up successfully" > "$syzkaller_log"
+  echo "$(date): The syzkaller environment has been set up successfully" >> "$syzkaller_log"
   echo "cd /root/image"
   echo "syz-manager --config my.cfg"
+  cd /root/image
+  syz-manager --config my.cfg
 }
 
 main() {
+  get_repo
   setup_qemu
   install_packages
   get_image
