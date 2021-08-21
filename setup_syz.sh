@@ -4,6 +4,8 @@ export PATH=${PATH}:/root/dockt
 syzkaller_log="/tmp/setup_syzkaller"
 IMAGE="/root/image/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
+INTEL_NEXT="https://github.com/intel-innersource/os.linux.intelnext.kernel.git"
+KERNEL_PATH="/root/os.linux.intelnext.kernel"
 
 usage() {
   cat <<__EOF
@@ -179,6 +181,37 @@ setup_qemu() {
   make install
 }
 
+clone_intel_next_kernel() {
+  rm -rf $KERNEL_PATH
+  cd /root
+  echo "git clone $INTEL_NEXT" >> $syzkaller_log
+  git clone "$INTEL_NEXT"
+}
+
+setup_intel_next_kernel() {
+  local check_git=""
+
+  if [[ "$SOURCE" == 'i' ]]; then
+    [[ -d "$KERNEL_PATH" ]] || clone_intel_next_kernel
+    cd $KERNEL_PATH
+    check_git=$(git log | head -n 1 2>/dev/null)
+    [[ -z "$check_git" ]] && {
+      echo "$KERNEL_PATH git log is null, reinstall">> $syzkaller_log
+      clone_intel_next_kernel
+    }
+    cd $KERNEL_PATH
+    check_git=$(git log | head -n 1 2>/dev/null)
+    if [[ -z "$check_git" ]]; then
+      echo "WARN:$KERNEL_PATH git log is null, return 1" >> $syzkaller_log
+    else
+      echo "$KERNEL_PATH is ready, git:$check_git" >> $syzkaller_log
+    fi
+  else
+    echo "SROURCE:$SOURCE is not i, will not install $INTEL_NEXT"
+    echo "SROURCE:$SOURCE is not i, will not install $INTEL_NEXT" >> $syzkaller_log
+  fi
+}
+
 get_image() {
   img=""
 
@@ -256,6 +289,7 @@ main() {
   get_repo
   install_packages
   setup_qemu
+  setup_intel_next_kernel
   get_image
   install_syzkaller
   install_vncserver
