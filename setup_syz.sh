@@ -195,10 +195,14 @@ setup_intel_next_kernel() {
     [[ -d "$KERNEL_PATH" ]] || clone_intel_next_kernel
     cd $KERNEL_PATH
     check_git=$(git log | head -n 1 2>/dev/null)
-    [[ -z "$check_git" ]] && {
+    if [[ -z "$check_git" ]]; then
       echo "$KERNEL_PATH git log is null, reinstall">> $syzkaller_log
       clone_intel_next_kernel
-    }
+    else
+      echo "$KERNEL_PATH git:$check_git is ready, no need reinstall"
+      echo "$KERNEL_PATH git:$check_git is ready, no need reinstall" >> $syzkaller_log
+      return 0
+    fi
     cd $KERNEL_PATH
     check_git=$(git log | head -n 1 2>/dev/null)
     if [[ -z "$check_git" ]]; then
