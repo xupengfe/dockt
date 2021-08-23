@@ -6,6 +6,9 @@ IMAGE="/root/image/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
 INTEL_NEXT="https://github.com/intel-innersource/os.linux.intelnext.kernel.git"
 KERNEL_PATH="/root/os.linux.intelnext.kernel"
+DEFAULT_PORT="10022"
+HOME_PATH=$(echo $HOME)
+IMAGE="/root/image/centos8_2.img"
 
 usage() {
   cat <<__EOF
@@ -124,6 +127,18 @@ install_packages() {
   yum -y install screen
 }
 
+clean_old_vm() {
+  local old_vm=""
+
+  old_vm=$(ps -ef | grep qemu | grep $DEFAULT_PORT  | awk -F " " '{print $2}')
+
+  [[ -z "$old_vm" ]] || {
+    echo "Kill old $DEFAULT_PORT qemu:$old_vm"
+    echo "Kill old $DEFAULT_PORT qemu:$old_vm" >> $syzkaller_log
+    kill -9 $old_vm
+  }
+}
+
 setup_qemu() {
   local qemu=""
   local qemu_o="qemu"
@@ -218,6 +233,8 @@ setup_intel_next_kernel() {
 
 get_image() {
   img=""
+  pub_content=""
+  bz_file="/root/image/bzImage_5.14-rc5cet"
 
   [[ "$IGNORE" -eq 1 ]] && {
     echo "IGNORE:$IGNORE is 1, will ignore image installation"
@@ -241,6 +258,47 @@ get_image() {
   rm -rf image.tar.gz
   wget http://xpf-desktop.sh.intel.com/syzkaller/image.tar.gz
   tar -xvf image.tar.gz
+
+  cd /root/image
+  if [[ -e "${HOME_PATH}/.ssh/id_rsa.pub" ]]; then
+    echo "${HOME_PATH}/.ssh/id_rsa.pub exist, no need regenerate it"
+    echo "${HOME_PATH}/.ssh/id_rsa.pub exist, no need regenerate it" >> $syzkaller_log
+  else
+    echo "No id_rsa.pub, will generate it"
+    echo "No id_rsa.pub, will generate it" >> $syzkaller_log
+    mkdir -p ${HOME_PATH}/.ssh/
+    ssh-keygen -t rsa -N '' -f ${HOME_PATH}/.ssh/id_rsa -q
+  fi
+  pub_content=$(cat ${HOME_PATH}/.ssh/id_rsa.pub)
+
+  echo $pub_content
+  echo $pub_content >> $syzkaller_log
+  clean_old_vm
+
+  qemu-system-x86_64 \
+    -m 2G \
+    -smp 2 \
+    -kernel $bz_file \
+    -append "console=ttyS0 root=/dev/sda earlyprintk=serial net.ifnames=0" \
+    -drive file=${IMAGE},format=raw \
+    -net user,host=10.0.2.10,hostfwd=tcp:127.0.0.1:${DEFAULT_PORT}-:22 \
+    -cpu host \
+    -net nic,model=e1000 \
+    -enable-kvm \
+    -nographic \
+    2>&1 | tee > /root/run_vm.log &
+
+  sleep 20
+  rm -rf /root/.ssh/known_hosts
+  # could not send the variable value to remote VM, so set value directly
+  echo "ssh -i /root/image/id_rsa_cent -o ConnectTimeout=1 -o 'StrictHostKeyChecking no' -p 10022 localhost 'echo \"$pub_content\" > ~/.ssh/authorized_keys'" > /root/image/pub.sh
+  chmod 755 /root/image/pub.sh
+  /root/image/pub.sh
+
+  ssh -i /root/image/id_rsa_cent -o ConnectTimeout=1 -o 'StrictHostKeyChecking no' -p $DEFAULT_PORT localhost 'cat ~/.ssh/authorized_keys'
+  scp -o 'StrictHostKeyChecking no' -P $DEFAULT_PORT ${HOME_PATH}/.ssh/id_rsa.pub root@localhost:/root/
+  sleep 1
+  clean_old_vm
 }
 
 install_syzkaller() {
