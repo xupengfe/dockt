@@ -15,7 +15,7 @@ usage() {
   usage: ./${0##*/} [-s o|i] [-f [0|1] [-i 0|1] [-h]
   -s  Source: o means official, i means intel-next (default i)
   -f  Force: 0 no reinstall if exist, 1 reinstall image (default 0)
-  -i  Ignore:0 will fully installation, 1 ignore rpm and image installation(default 0)
+  -i  Ignore:0 will fully installation, 1 ignore rpm and image installation, i:2 will ignore qemu if exist(default 0)
   -h  Help
 __EOF
   exit 2
@@ -149,7 +149,7 @@ setup_qemu() {
   [[ -z "$qemu" ]] || {
     echo "$qemu exist"
     result=1
-    if [[ "$IGNORE" -eq 1 ]]; then
+    if [[ "$IGNORE" -eq 2 ]]; then
       echo "$qemu exist and IGNORE:$IGNORE, will not reinstall qemu"
       echo "$qemu exist and IGNORE:$IGNORE, will not reinstall qemu" >> $syzkaller_log
     return 0
