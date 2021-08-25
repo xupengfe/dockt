@@ -197,6 +197,7 @@ setup_qemu() {
   if [[ "$SOURCE" == "$OFFICIAL" ]]; then
     [[ -d "/root/$qemu_o" ]] && [[ "$result" -eq 1 ]] && {
       echo "$qemu_o amd $qemu folder exist, no need to install"
+      qemu_version_check
       return 0
     }
     echo "rm -rf $qemu_o"
@@ -209,6 +210,7 @@ setup_qemu() {
   elif [[ "$SOURCE" == "$NEXT" ]]; then
     [[ -d "/root/$qemu_i" ]] && [[ "$result" -eq 1 ]] && {
       echo "$qemu_i amd $qemu folder exist, no need to install"
+      qemu_version_check
       return 0
     }
     echo "rm -rf $qemu_i"
@@ -227,6 +229,8 @@ setup_qemu() {
     rm -rf /root/qemu_o
   else
     echo "Invalid SOURCE:$SOURCE, do nothing for qemu"
+    echo "$(date): Invalid SOURCE:$SOURCE, do nothing for qemu" >> $syzkaller_log
+    echo "$(date): Invalid SOURCE:$SOURCE, do nothing for qemu" >> $QEMU_LOG
     return 1
   fi
 
