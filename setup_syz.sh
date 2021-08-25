@@ -130,6 +130,8 @@ install_packages() {
   yum -y install glibc.i686 --allowerasing
   yum install -y ninja-build.x86_64
   yum -y install screen
+  # syz-prog2c need to use clang-format
+  yum install -y clang-tools-extra
 }
 
 clean_old_vm() {
@@ -156,18 +158,18 @@ qemu_version_check() {
   else
     echo "$qemu_ver" >> $QEMU_LOG
   fi
-  qemu_check=$(qemu-system-x86_64 --version 2>/dev/null | grep "$OFFICIAL_TAG")
+  qemu_check=$(qemu-system-x86_64 --version 2>/dev/null | grep "($OFFICIAL_TAG)")
   if [[ -n "$qemu_check" ]]; then
-    # Check $OFFICIAL_TAG is matched with official version
+    # Check OFFICIAL TAG is matched with official version
     if [[ "$SOURCE" == "$OFFICIAL" ]]; then
-      echo "$SOURCE mataches offical version" >> $QEMU_LOG
+      echo "$SOURCE mataches offical version:$OFFICIAL_TAG" >> $QEMU_LOG
     else
-      echo "WARN:$SOURCE should not match offical version" >> $QEMU_LOG
+      echo "WARN:$SOURCE should not match offical version:$OFFICIAL_TAG" >> $QEMU_LOG
     fi
   else
-    # Check $OFFICIAL_TAG is next version should not match with official version
+    # Check OFFICIAL TAG is next version should not match with official version
     if [[ "$SOURCE" == "$OFFICIAL" ]]; then
-      echo "WARN:$SOURCE should not matach the offical version" >> $QEMU_LOG
+      echo "WARN:$SOURCE should not matach the offical version:$OFFICIAL_TAG" >> $QEMU_LOG
     else
       echo "$SOURCE mataches QEMU next version" >> $QEMU_LOG
     fi
