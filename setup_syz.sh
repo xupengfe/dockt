@@ -9,6 +9,10 @@ KERNEL_PATH="/root/os.linux.intelnext.kernel"
 DEFAULT_PORT="10022"
 HOME_PATH=$(echo $HOME)
 IMAGE="/root/image/centos8_2.img"
+QEMU_LOG="/opt/install_qemu.log"
+OFFICIAL="qemu-official"
+NEXT="qemu-next"
+OFFICIAL_TAG="v6.0.0"
 
 usage() {
   cat <<__EOF
@@ -144,6 +148,9 @@ setup_qemu() {
   local qemu_o="qemu"
   local qemu_i="virtualization.hypervisors.server.vmm.qemu-next"
   local result=""
+  local qemu_info=""
+  local qemu_ver=""
+  local qemu_check=""
 
   qemu=$(which qemu-system-x86_64)
   [[ -z "$qemu" ]] || {
@@ -167,9 +174,10 @@ setup_qemu() {
     rm -rf $qemu_o
     git clone https://github.com/qemu/qemu.git
     cd $qemu_o
-    git checkout -f v6.0.0
+    git checkout -f $OFFICIAL_TAG
     # delete intel qemu next to remind it's qemu official version
     rm -rf /root/$qemu_i
+    qemu_info="$OFFICIAL"
   elif [[ "$SOURCE" == 'i' ]]; then
     [[ -d "/root/$qemu_i" ]] && [[ "$result" -eq 1 ]] && {
       echo "$qemu_i amd $qemu folder exist, no need to install"
@@ -188,6 +196,7 @@ setup_qemu() {
     git checkout -f origin/spr-beta
     # delete official to remind it's intel qemu next version
     rm -rf /root/qemu_o
+    qemu_info="$NEXT"
   else
     echo "Invalid SOURCE:$SOURCE, do nothing for qemu"
     return 1
@@ -199,6 +208,29 @@ setup_qemu() {
   ../configure --target-list=x86_64-softmmu --enable-kvm --enable-vnc --enable-gtk --enable-sdl
   make
   make install
+  echo "$(date %m%d_%H%M%S): $qemu_info is ready" > $QEMU_LOG
+  qemu_ver=$(qemu-system-x86_64 --version 2>/dev/null)
+  if [[ -z "$qemu_ver" ]]; then
+    echo "WARN: QEMU version is null:$qemu_ver" >> $QEMU_LOG
+  else
+    echo "$qemu_ver" >> $QEMU_LOG
+  fi
+  qemu_check=$(qemu-system-x86_64 --version 2>/dev/null | grep "$OFFICIAL_TAG")
+  if [[ -n "$qemu_check" ]]; then
+    # Check $OFFICIAL_TAG is matched with official version
+    if [[ "$qemu_ver" == "$OFFICIAL" ]]; then
+      echo "$qemu_ver mataches offical version" >> $QEMU_LOG
+    else
+      echo "WARN:$qemu_ver is not matched with offical version" >> $QEMU_LOG
+    fi
+  else
+    # Check $OFFICIAL_TAG is next version should not match with official version
+    if [[ "$qemu_ver" == "$OFFICIAL" ]]; then
+      echo "WARN:$qemu_ver should not matach the offical version" >> $QEMU_LOG
+    else
+      echo "$qemu_ver mataches QEMU next version" >> $QEMU_LOG
+    fi
+  fi
 }
 
 clone_intel_next_kernel() {
