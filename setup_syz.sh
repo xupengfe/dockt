@@ -32,6 +32,7 @@ check_syzkaller() {
   if [[ -z "$old_pid" ]]; then
     echo "No syzkaller pid run" >> "$syzkaller_log"
   else
+    echo "Syzkaller pid $old_pid already run, no need set up, exit"
     echo "Syzkaller pid $old_pid already run, no need set up, exit" >> "$syzkaller_log"
     exit 0
   fi
