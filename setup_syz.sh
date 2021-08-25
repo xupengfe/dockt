@@ -148,7 +148,7 @@ qemu_version_check() {
   local qemu_ver=""
   local qemu_check=""
 
-  echo "$(date %m%d_%H%M%S): $SOURCE (o:QEMU-official, i:QEMU-next) is ready" > $QEMU_LOG
+  echo "$(date +%Y-%m-%d_%H:%M:%S):$SOURCE (o:QEMU-official, i:QEMU-next) is ready" > $QEMU_LOG
   qemu_ver=$(qemu-system-x86_64 --version 2>/dev/null)
   if [[ -z "$qemu_ver" ]]; then
     echo "WARN: QEMU version is null:$qemu_ver, please contact with pengfei.xu@intel.com" >> $QEMU_LOG
@@ -388,7 +388,7 @@ install_vncserver() {
 next_to_do() {
   echo "Set up log: $syzkaller_log"
   echo "Install syzkaller environment successfully. Next follow below to run syzkaller:"
-  echo "$(date): The syzkaller environment has been set up successfully" >> "$syzkaller_log"
+  echo "$(date +%Y-%m-%d_%H%M%S): The syzkaller environment has been set up successfully" >> "$syzkaller_log"
   echo "cd /root/image"
   echo "syz-manager --config my.cfg"
   cd /root/image
