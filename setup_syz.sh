@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export PATH=${PATH}:/root/dockt
-syzkaller_log="/root/setup_syzkaller"
+syzkaller_log="/root/setup_syzkaller.log"
 IMAGE="/root/image/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
 INTEL_NEXT="https://github.com/intel-innersource/os.linux.intelnext.kernel.git"
@@ -9,6 +9,9 @@ KERNEL_PATH="/root/os.linux.intelnext.kernel"
 DEFAULT_PORT="10022"
 HOME_PATH=$(echo $HOME)
 IMAGE="/root/image/centos8_2.img"
+BZ_PATH="/root/bzimage_bisect"
+SCAN_SCRIPT="scan_bisect.sh"
+SCAN_SRV="scansyz.service"
 QEMU_LOG="/opt/install_qemu.log"
 OFFICIAL="o"
 NEXT="i"
@@ -390,12 +393,54 @@ install_vncserver() {
   echo "vncserver"
 }
 
+start_scan_service() {
+  local scan_service="/etc/systemd/system/${SCAN_SRV}"
+  local check_scan_pid=""
+
+  [[ -e "$scan_service" ]] && [[ -e "/usr/bin/${SCAN_SCRIPT}" ]] && {
+    check_scan_pid=$(ps -ef | grep scan_bisect | grep sh)
+    if [[ -z "$check_scan_pid" ]];then
+      echo "no $SCAN_SCRIPT pid, will reinstall"
+    else
+      echo "$scan_service & /usr/bin/$SCAN_SCRIPT and pid:$SCAN_SCRIPT exist, no need reinstall $SCAN_SRV service"
+      echo "$scan_service & /usr/bin/$SCAN_SCRIPT and pid:$SCAN_SCRIPT exist, no need reinstall $SCAN_SRV service" >> "$syzkaller_log"
+      return 0
+    fi
+  }
+
+  echo "BZ_PATH:$BZ_PATH"
+  [[ -d "$BZ_PATH" ]] || {
+    echo "No $BZ_PATH folder!"
+    exit 1
+  }
+
+  echo "ln -s ${BZ_PATH}/${SCAN_SCRIPT} /usr/bin/${SCAN_SCRIPT}"
+  rm -rf /usr/bin/${SCAN_SCRIPT}
+  ln -s ${BZ_PATH}/${SCAN_SCRIPT} /usr/bin/${SCAN_SCRIPT}
+
+echo "[Service]" > $scan_service
+echo "Type=simple" >> $scan_service
+echo "ExecStart=${BZ_PATH}/${SCAN_SCRIPT}" >> $scan_service
+echo "[Install]" >> $scan_service
+echo "WantedBy=multi-user.target graphical.target" >> $scan_service
+
+sleep 1
+
+systemctl daemon-reload
+systemctl enable $SCAN_SRV
+systemctl start $SCAN_SRV
+
+systemctl status $SCAN_SRV
+}
+
 next_to_do() {
   echo "Set up log: $syzkaller_log"
   echo "Install syzkaller environment successfully. Next follow below to run syzkaller:"
   echo "$(date +%Y-%m-%d_%H%M%S): The syzkaller environment has been set up successfully" >> "$syzkaller_log"
   echo "cd /root/image"
   echo "syz-manager --config my.cfg"
+
+  start_scan_service
 
   if [[ -n "$TAG" ]]; then
     if [[ -n "$KER_PATH" ]]; then
