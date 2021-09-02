@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export PATH=${PATH}:/root/dockt
-syzkaller_log="/tmp/setup_syzkaller"
+syzkaller_log="/root/setup_syzkaller"
 IMAGE="/root/image/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
 INTEL_NEXT="https://github.com/intel-innersource/os.linux.intelnext.kernel.git"
@@ -16,7 +16,7 @@ OFFICIAL_TAG="v6.0.0"
 
 usage() {
   cat <<__EOF
-  usage: ./${0##*/} [-s o|i] [-f [0|1] [-i 0|1] [-h]
+  usage: ./${0##*/} [-s o|i] [-f [0|1] [-i 0|1] [-t tag or commit][-h]
   -s  Source: o means official, i means intel-next (default i)
   -f  Force: 0 no reinstall if exist, 1 reinstall image (default 0)
   -i  Ignore:0 will fully installation, 1 ignore rpm and image installation, i:2 will ignore qemu if exist(default 0)
@@ -393,8 +393,15 @@ next_to_do() {
   echo "$(date +%Y-%m-%d_%H%M%S): The syzkaller environment has been set up successfully" >> "$syzkaller_log"
   echo "cd /root/image"
   echo "syz-manager --config my.cfg"
-  cd /root/image
-  syz-manager --config my.cfg
+
+  if [[ -n "$TAG" ]]; then
+    echo "/root/bzimage_bisect/run_syzkaller.sh $TAG" >> "$syzkaller_log"
+    /root/bzimage_bisect/run_syzkaller.sh "$TAG"
+  else
+    echo "No TAG:$TAG, run syzkaller as default" >> "$syzkaller_log"
+    cd /root/image
+    syz-manager --config my.cfg
+  fi
 }
 
 main() {
@@ -413,7 +420,7 @@ main() {
 : "${SOURCE:=i}"
 : "${IGNORE:=0}"
 : "${FORCE:=0}"
-while getopts :s:f:i:h arg; do
+while getopts :s:f:i:t:h arg; do
   case $arg in
     s)
       SOURCE=$OPTARG
@@ -423,6 +430,9 @@ while getopts :s:f:i:h arg; do
       ;;
     i)
       IGNORE=$OPTARG
+      ;;
+    t)
+      TAG=$OPTARG
       ;;
     h)
       usage
