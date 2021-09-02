@@ -16,10 +16,13 @@ OFFICIAL_TAG="v6.0.0"
 
 usage() {
   cat <<__EOF
-  usage: ./${0##*/} [-s o|i] [-f [0|1] [-i 0|1] [-t tag or commit][-h]
+  usage: ./${0##*/} [-s o|i][-f [0|1][-i 0|1][-t][-k][-b][-h]
   -s  Source: o means official, i means intel-next (default i)
   -f  Force: 0 no reinstall if exist, 1 reinstall image (default 0)
   -i  Ignore:0 will fully installation, 1 ignore rpm and image installation, i:2 will ignore qemu if exist(default 0)
+  -t  Commit with head(End commit)
+  -k  Develop Kernel path, if intel-next kernel no need set, will download in /root/os.linux.intelnext.kernel/ automatically
+  -b  Based start commit from develop kernel, which means based on which main line kernel commit
   -h  Help
 __EOF
   exit 2
@@ -395,8 +398,20 @@ next_to_do() {
   echo "syz-manager --config my.cfg"
 
   if [[ -n "$TAG" ]]; then
-    echo "/root/bzimage_bisect/run_syzkaller.sh $TAG" >> "$syzkaller_log"
-    /root/bzimage_bisect/run_syzkaller.sh "$TAG"
+    if [[ -n "$KER_PATH" ]]; then
+      if [[ -n "$START_COMMIT" ]]; then
+        echo "/root/bzimage_bisect/run_syzkaller.sh $TAG" >> "$syzkaller_log"
+        /root/bzimage_bisect/run_syzkaller.sh "$TAG" "$KER_PATH" "$START_COMMIT"
+      else
+        echo  "KER:$KER_PATH contain value but no START_COMMIT:$START_COMMIT"
+        echo  "KER:$KER_PATH contain value but no START_COMMIT:$START_COMMIT" >> "$syzkaller_log"
+        /root/bzimage_bisect/run_syzkaller.sh "$TAG"
+      fi
+    else
+      echo "/root/bzimage_bisect/run_syzkaller.sh $TAG" >> "$syzkaller_log"
+      /root/bzimage_bisect/run_syzkaller.sh "$TAG"
+    fi
+
   else
     echo "No TAG:$TAG, run syzkaller as default" >> "$syzkaller_log"
     cd /root/image
@@ -420,7 +435,7 @@ main() {
 : "${SOURCE:=i}"
 : "${IGNORE:=0}"
 : "${FORCE:=0}"
-while getopts :s:f:i:t:h arg; do
+while getopts :s:f:i:t:k:b:h arg; do
   case $arg in
     s)
       SOURCE=$OPTARG
@@ -433,6 +448,13 @@ while getopts :s:f:i:t:h arg; do
       ;;
     t)
       TAG=$OPTARG
+      ;;
+    k)
+      KER_PATH=$OPTART
+      ;;
+    b)
+      # based start commit
+      START_COMMIT=$OPTART
       ;;
     h)
       usage
