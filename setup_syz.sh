@@ -430,7 +430,7 @@ systemctl daemon-reload
 systemctl enable $SCAN_SRV
 systemctl start $SCAN_SRV
 
-systemctl status $SCAN_SRV
+systemctl status $SCAN_SRV &
 }
 
 next_to_do() {
