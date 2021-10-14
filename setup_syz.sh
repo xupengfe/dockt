@@ -16,6 +16,7 @@ QEMU_LOG="/opt/install_qemu.log"
 OFFICIAL="o"
 NEXT="i"
 OFFICIAL_TAG="v6.0.0"
+HTML_FOLDER="/var/www/html"
 
 usage() {
   cat <<__EOF
@@ -77,6 +78,8 @@ get_repo() {
 }
 
 install_packages() {
+  local httpd_result=""
+
   [[ "$IGNORE" -eq 1 ]] && {
     echo "IGNORE:$IGNORE is 1, will ignore rpm installation"
     return 0
@@ -138,6 +141,23 @@ install_packages() {
   yum -y install screen
   # syz-prog2c need to use clang-format
   yum install -y clang-tools-extra
+  httpd_result=$(which httpd 2>/dev/null)
+  [[ -n "$httpd_result" ]] || {
+    echo "yum install httpd -y"
+    yum install httpd -y
+
+    echo "mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf_backup"
+    mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf_backup
+
+    mkdir -p $HTML_FOLDER
+    echo "$(date +%Y-%m-%d_%H:%M:%S) created apache" >> ${HTML_FOLDER}/apache_record.txt
+
+    echo "systemctl restart httpd"
+    systemctl restart httpd
+
+    echo "systemctl enable httpd"
+    systemctl enable httpd
+  }
 }
 
 clean_old_vm() {
