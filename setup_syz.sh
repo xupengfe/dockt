@@ -138,6 +138,8 @@ install_packages() {
   yum -y install debootstrap.noarch
   yum -y install glibc.i686 --allowerasing
   yum install -y ninja-build.x86_64
+  yum -y install spice-server.x86_64
+  yum -y install spice-server-devel.x86_64
   yum -y install screen
   # syz-prog2c need to use clang-format
   yum install -y clang-tools-extra
