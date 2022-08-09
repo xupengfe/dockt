@@ -488,8 +488,9 @@ next_to_do() {
 }
 
 main() {
-  echo "$date: SOURCE:$SOURCE|FORCE:$FORCE|IGNORE:$IGNORE|TAG:$TAG|KER:$KER_PATH|START_COMMIT:$START_COMMIT"
-  echo "$date: SOURCE:$SOURCE|FORCE:$FORCE|IGNORE:$IGNORE|TAG:$TAG|KER:$KER_PATH|START_COMMIT:$START_COMMIT" >> "$syzkaller_log"
+  echo "$(date +%Y-%m-%d_%H:%M:%S): SOURCE:$SOURCE|FORCE:$FORCE|IGNORE:$IGNORE|TAG:$TAG|KER:$KER_PATH|START_COMMIT:$START_COMMIT"
+  echo "===================="
+  echo "$(date +%Y-%m-%d_%H:%M:%S): SOURCE:$SOURCE|FORCE:$FORCE|IGNORE:$IGNORE|TAG:$TAG|KER:$KER_PATH|START_COMMIT:$START_COMMIT" >> "$syzkaller_log"
   get_repo
   install_packages
   setup_qemu
