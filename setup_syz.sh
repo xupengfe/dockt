@@ -520,11 +520,11 @@ while getopts :s:f:i:t:k:b:h arg; do
       TAG=$OPTARG
       ;;
     k)
-      KER_PATH=$OPTART
+      KER_PATH=$OPTARG
       ;;
     b)
       # based start commit
-      START_COMMIT=$OPTART
+      START_COMMIT=$OPTARG
       ;;
     h)
       usage
