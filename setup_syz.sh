@@ -107,7 +107,7 @@ install_packages() {
   yum -y install patch
   yum -y install automake
   yum -y install libstdc++-devel
-  yum -y install libstdc++-static
+  yum -y install libstdc++-static
   yum -y install alsa-lib-devel
   yum -y install cmake
   dnf -y install libusbx-devel
@@ -468,7 +468,7 @@ next_to_do() {
   if [[ -n "$TAG" ]]; then
     if [[ -n "$KER_PATH" ]]; then
       if [[ -n "$START_COMMIT" ]]; then
-        echo "/root/bzimage_bisect/run_syzkaller.sh $TAG" >> "$syzkaller_log"
+        echo "/root/bzimage_bisect/run_syzkaller.sh $TAG $KER_PATH $START_COMMIT" >> "$syzkaller_log"
         /root/bzimage_bisect/run_syzkaller.sh "$TAG" "$KER_PATH" "$START_COMMIT"
       else
         echo  "KER:$KER_PATH contain value but no START_COMMIT:$START_COMMIT"
