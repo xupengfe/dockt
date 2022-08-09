@@ -489,8 +489,14 @@ next_to_do() {
 
 main() {
   echo "$(date +%Y-%m-%d_%H:%M:%S): SOURCE:$SOURCE|FORCE:$FORCE|IGNORE:$IGNORE|TAG:$TAG|KER:$KER_PATH|START_COMMIT:$START_COMMIT"
-  echo "===================="
+  echo "====================" >> "$syzkaller_log"
   echo "$(date +%Y-%m-%d_%H:%M:%S): SOURCE:$SOURCE|FORCE:$FORCE|IGNORE:$IGNORE|TAG:$TAG|KER:$KER_PATH|START_COMMIT:$START_COMMIT" >> "$syzkaller_log"
+
+  if [[ -z "$KER_PATH" ]]; then
+    KER_PATH=$KERNEL_PATH
+    echo "KER_PATH is null, use $KERNEL_PATH as default" >> "$syzkaller_log"
+  fi
+
   get_repo
   install_packages
   setup_qemu
