@@ -10,7 +10,9 @@ IMAGE="/root/image"
 qemu-system-x86_64 \
         -m 2G \
         -smp 2 \
+        -device vfio-pci,host="00:0d.0" \
         -device vfio-pci,host="00:0d.2" \
+        -device vfio-pci,host="00:0d.3" \
         -kernel $bzimage \
         -append "console=ttyS0 root=/dev/sda earlyprintk=serial net.ifnames=0 thunderbolt.dyndbg" \
         -drive file=./centos8_2.img,format=raw \
