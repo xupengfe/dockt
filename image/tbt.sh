@@ -10,13 +10,35 @@ get_dinfo() {
   di1=$(echo $did | cut -d ":" -f 1)
   di2=$(echo $did | cut -d ":" -f 2)
   DINFO="$di1 $di2"
-  echo "$dinfo ->  $DINFO" 
+  echo "$dinfo ->  $DINFO"
+}
+
+load_vfio() {
+  local vfio=""
+
+  vfio=$(lsmod | grep vfio)
+  if [[ -z "$vfio" ]]; then
+    echo "vfio_pci is not loaded and load it."
+    modprobe vfio_pci
+    vfio=$(lsmod | grep vfio)
+    if [[ -z "$vfio" ]]; then
+       echo "vfio_pci could not be loaded and exit"
+       exit 1
+    else
+       echo "load vfio_pci successfully."
+    fi
+  else
+    echo "vfio_pci is alread loaded."
+  fi
 }
 
 main() {
   d0i="0000:00:0d.0"
   d2i="0000:00:0d.2"
   d3i="0000:00:0d.3"
+
+  # Make sure vfio_pci is loaded
+  load_vfio
 
   #d0d="8086 a71e"
   #d2d="8086 a73e"
