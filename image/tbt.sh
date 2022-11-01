@@ -77,10 +77,10 @@ main() {
   echo "echo $d0i  >    /sys/bus/pci/drivers/vfio-pci/bind"
   echo "$d0i"  >    /sys/bus/pci/drivers/vfio-pci/bind
 
-  echo "echo "$d2i"  >    /sys/bus/pci/drivers/vfio-pci/bind"
+  echo "echo $d2i  >    /sys/bus/pci/drivers/vfio-pci/bind"
   echo "$d2i"  >    /sys/bus/pci/drivers/vfio-pci/bind
 
-  echo"echo "$d3i"  >    /sys/bus/pci/drivers/vfio-pci/bind"
+  echo "echo $d3i  >    /sys/bus/pci/drivers/vfio-pci/bind"
   echo "$d3i"  >    /sys/bus/pci/drivers/vfio-pci/bind
 }
 
