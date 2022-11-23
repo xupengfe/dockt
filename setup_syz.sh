@@ -15,7 +15,7 @@ SCAN_SRV="scansyz.service"
 QEMU_LOG="/opt/install_qemu.log"
 OFFICIAL="o"
 NEXT="i"
-OFFICIAL_TAG="v6.0.0"
+OFFICIAL_TAG="v7.1.0"
 HTML_FOLDER="/var/www/html"
 
 usage() {
