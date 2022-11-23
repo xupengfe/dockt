@@ -396,12 +396,12 @@ install_syzkaller() {
   cd syzkaller
   mkdir workdir
   make
-  check_env=$(cat /root/.bashrc | grep syzkaller)
+  check_env=$(cat $bashrc | grep syzkaller)
   [[ -n "$check_env" ]] || {
     echo "export PATH=/root/syzkaller/bin:\$PATH" >> $bashrc
     echo "export PATH=/root/syzkaller/bin/linux_amd64:\$PATH" >> $bashrc
     echo "export PATH=/usr/local/bin:\$PATH" >> $bashrc
-    sudo bash
+    source $bashrc
   }
 }
 
