@@ -13,6 +13,7 @@ BZ_PATH="/root/bzimage_bisect"
 SCAN_SCRIPT="scan_bisect.sh"
 SCAN_SRV="scansyz.service"
 QEMU_LOG="/opt/install_qemu.log"
+SYZ_FOLDER="/root/syzkaller"
 OFFICIAL="o"
 NEXT="i"
 OFFICIAL_TAG="v7.1.0"
@@ -205,7 +206,6 @@ qemu_version_check() {
   fi
 }
 
-
 setup_qemu() {
   local qemu=""
   local qemu_o="qemu"
@@ -384,6 +384,17 @@ install_syzkaller() {
   check_syz=""
   check_env=""
   bashrc="/root/.bashrc"
+
+  # Each time set up or run, will update syzkaller to latest!
+  if [[ -d "$SYZ_FOLDER" ]]; then
+    echo "cd $SYZ_FOLDER; git pull; make" >> $syzkaller_log
+    cd $SYZ_FOLDER
+    git pull
+    make
+    sleep 1
+  else
+    echo "No $SYZ_FOLDER, will install syzkaller in first time" >> $syzkaller_log
+  fi
 
   check_syz=$(which syz-manager)
   [[ -z "$check_syz" ]] || {
