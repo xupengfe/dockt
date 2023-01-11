@@ -23,4 +23,4 @@ else
 fi
 
 echo "Next please cd target folder, then run below command:"
-echo "docker run -it -v `pwd`:/src $IMG_NAME bash"
+echo "docker run -it -v \$(pwd):/src $IMG_NAME bash"
