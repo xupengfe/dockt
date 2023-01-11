@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMG_NAME="ubun1"
+IMG_NAME="ubuntu22"
 
 CHECK=$(docker image ls | grep "$IMG_NAME")
 
