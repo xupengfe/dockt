@@ -13,9 +13,14 @@ if [[ -z "$CHECK" ]]; then
   docker image build .
   echo "docker image ls | grep $IMG_NAME"
   docker image ls | grep $IMG_NAME
-  echo "docker run -it $IMG_NAME bash"
-  docker run -it "$IMG_NAME" bash
+  #echo "docker run -it $IMG_NAME bash"
+  #docker run -it "$IMG_NAME" bash
 else
-  echo "docker run -it $IMG_NAME bash"
-  docker run -it "$IMG_NAME" bash
+  echo "docker image ls | grep $IMG_NAME"
+  docker image ls | grep $IMG_NAME
+  #echo "docker run -it $IMG_NAME bash"
+  #docker run -it "$IMG_NAME" bash
 fi
+
+echo "Next please cd target folder, then run below command:"
+echo "docker run -it -v `pwd`:/src $IMG_NAME bash"
