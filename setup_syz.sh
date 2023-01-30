@@ -16,7 +16,7 @@ QEMU_LOG="/opt/install_qemu.log"
 SYZ_FOLDER="/root/syzkaller"
 OFFICIAL="o"
 NEXT="i"
-OFFICIAL_TAG="v7.2.0"
+OFFICIAL_TAG="v7.1.0"
 HTML_FOLDER="/var/www/html"
 
 usage() {
