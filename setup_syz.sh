@@ -184,24 +184,26 @@ qemu_version_check() {
   qemu_ver=$(qemu-system-x86_64 --version 2>/dev/null)
   if [[ -z "$qemu_ver" ]]; then
     echo "WARN: QEMU version is null:$qemu_ver, please contact with pengfei.xu@intel.com" >> $QEMU_LOG
+    echo "WARN: QEMU version is null:$qemu_ver, please contact with pengfei.xu@intel.com" >> $syzkaller_log
     return 1
   else
     echo "$qemu_ver" >> $QEMU_LOG
+    echo "$qemu_ver" >> $syzkaller_log
   fi
   qemu_check=$(qemu-system-x86_64 --version 2>/dev/null | grep "($OFFICIAL_TAG)")
   if [[ -n "$qemu_check" ]]; then
     # Check OFFICIAL TAG is matched with official version
     if [[ "$SOURCE" == "$OFFICIAL" ]]; then
-      echo "$SOURCE mataches offical version:$OFFICIAL_TAG" >> $QEMU_LOG
+      echo "$SOURCE mataches offical version:$OFFICIAL_TAG" >> $syzkaller_log
     else
-      echo "WARN:$SOURCE should not match offical version:$OFFICIAL_TAG" >> $QEMU_LOG
+      echo "WARN:$SOURCE should not match offical version:$OFFICIAL_TAG" >> $syzkaller_log
     fi
   else
     # Check OFFICIAL TAG is next version should not match with official version
     if [[ "$SOURCE" == "$OFFICIAL" ]]; then
-      echo "WARN:$SOURCE should not matach the offical version:$OFFICIAL_TAG" >> $QEMU_LOG
+      echo "WARN:$SOURCE should not matach the offical version:$OFFICIAL_TAG" >> $syzkaller_log
     else
-      echo "$SOURCE mataches QEMU next version" >> $QEMU_LOG
+      echo "$SOURCE mataches QEMU next version" >> $syzkaller_log
     fi
   fi
 }
@@ -228,16 +230,16 @@ setup_qemu() {
   if [[ "$SOURCE" == "$OFFICIAL" ]]; then
     [[ -d "/root/$qemu_o" ]] && [[ "$result" -eq 1 ]] && {
       echo "$qemu_o and $qemu folder exist, no need to install"
-      echo "$qemu_o and $qemu folder exist, no need to install" >> $QEMU_LOG
+      echo "$qemu_o and $qemu folder exist, no need to install" >> $syzkaller_log
       qemu_version_check
       return 0
     }
     echo "rm -rf $qemu_o"
-    echo "rm -rf $qemu_o" >> $QEMU_LOG
+    echo "rm -rf $qemu_o" >> $syzkaller_log
     rm -rf $qemu_o
     if [[ -d "/root/${qemu_o}_bak" ]]; then
         echo "Folder /root/${qemu_o}_bak exist will move to /root/$qemu_o"
-        echo "Folder /root/${qemu_o}_bak exist will move to /root/$qemu_o" >> $QEMU_LOG
+        echo "Folder /root/${qemu_o}_bak exist will move to /root/$qemu_o" >> $syzkaller_log
         mv /root/${qemu_o}_bak /root/$qemu_o
         echo "git fetch origin"
         git fetch origin
@@ -246,13 +248,13 @@ setup_qemu() {
     fi
     cd $qemu_o || {
       echo "cd $qemu_o failed!!!"
-      echo "cd $qemu_o failed!!!" >> $QEMU_LOG
+      echo "cd $qemu_o failed!!!" >> $syzkaller_log
     }
-    echo "git checkout -f $OFFICIAL_TAG" >> $QEMU_LOG
+    echo "git checkout -f $OFFICIAL_TAG" >> $syzkaller_log
     git checkout -f $OFFICIAL_TAG
     # delete intel qemu next to remind it's qemu official version
     echo "mv /root/$qemu_i /root/${qemu_i}_bak"
-    echo "mv /root/$qemu_i /root/${qemu_i}_bak" >> $QEMU_LOG
+    echo "mv /root/$qemu_i /root/${qemu_i}_bak" >> $syzkaller_log
     mv /root/$qemu_i /root/${qemu_i}_bak
   elif [[ "$SOURCE" == "$NEXT" ]]; then
     [[ -d "/root/$qemu_i" ]] && [[ "$result" -eq 1 ]] && {
@@ -265,7 +267,7 @@ setup_qemu() {
     git clone $QEMU_NEXT
     [[ $? -ne 0 ]] && {
       echo "Could not get $QEMU_NEXT, please 'dt setup'!!!!"
-      echo "Could not get $QEMU_NEXT, please 'dt setup'!!!!" >> $syzkaller_log
+      echo "$(date): Could not get $QEMU_NEXT, please 'dt setup'!!!!" >> $syzkaller_log
       echo "$(date): Could not get $QEMU_NEXT, please 'dt setup'!!!!" >> $QEMU_LOG
       echo "Check $syzkaller_log"
       exit 1
