@@ -16,7 +16,7 @@ QEMU_LOG="/opt/install_qemu.log"
 SYZ_FOLDER="/root/syzkaller"
 OFFICIAL="o"
 NEXT="i"
-OFFICIAL_TAG="v7.1.0"
+OFFICIAL_TAG="v7.2.0"
 HTML_FOLDER="/var/www/html"
 
 usage() {
@@ -213,21 +213,21 @@ setup_qemu() {
   local result=""
 
   qemu=$(which qemu-system-x86_64)
-  [[ -z "$qemu" ]] || {
-    echo "$qemu exist"
-    result=1
-    if [[ "$IGNORE" -eq 2 ]]; then
-      echo "$qemu exist and IGNORE:$IGNORE, will not reinstall qemu"
-      echo "$qemu exist and IGNORE:$IGNORE, will not reinstall qemu" >> $syzkaller_log
-    return 0
-    fi
-  }
+  #[[ -z "$qemu" ]] || {
+  #  echo "$qemu exist"
+  #  result=1
+  #  if [[ "$IGNORE" -eq 2 ]]; then
+  #    echo "$qemu exist and IGNORE:$IGNORE, will not reinstall qemu"
+  #    echo "$qemu exist and IGNORE:$IGNORE, will not reinstall qemu" >> $syzkaller_log
+  #  return 0
+  #  fi
+  #}
 
   cd /root/
 
   if [[ "$SOURCE" == "$OFFICIAL" ]]; then
     [[ -d "/root/$qemu_o" ]] && [[ "$result" -eq 1 ]] && {
-      echo "$qemu_o amd $qemu folder exist, no need to install"
+      echo "$qemu_o and $qemu folder exist, no need to install"
       qemu_version_check
       return 0
     }
