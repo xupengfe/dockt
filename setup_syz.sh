@@ -242,7 +242,11 @@ setup_qemu() {
     else
       git clone https://github.com/qemu/qemu.git
     fi
-    cd $qemu_o || echo "cd $qemu_o failed!!!"
+    cd $qemu_o || {
+      echo "cd $qemu_o failed!!!"
+      echo "cd $qemu_o failed!!!" >> $QEMU_LOG
+    }
+    echo "git checkout -f $OFFICIAL_TAG" >> $QEMU_LOG
     git checkout -f $OFFICIAL_TAG
     # delete intel qemu next to remind it's qemu official version
     echo "mv /root/$qemu_i /root/${qemu_i}_bak"
