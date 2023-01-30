@@ -241,15 +241,17 @@ setup_qemu() {
         echo "Folder /root/${qemu_o}_bak exist will move to /root/$qemu_o"
         echo "Folder /root/${qemu_o}_bak exist will move to /root/$qemu_o" >> $syzkaller_log
         mv /root/${qemu_o}_bak /root/$qemu_o
-        echo "git fetch origin"
-        git fetch origin
     else
       git clone https://github.com/qemu/qemu.git
     fi
-    cd $qemu_o || {
-      echo "cd $qemu_o failed!!!"
-      echo "cd $qemu_o failed!!!" >> $syzkaller_log
+    echo "cd /root/$qemu_o" >> $syzkaller_log
+    cd /root/$qemu_o || {
+      echo "cd /root/$qemu_o failed!!!"
+      echo "cd /root/$qemu_o failed!!!" >> $syzkaller_log
     }
+    echo "git fetch origin"
+    echo "git fetch origin" >> $syzkaller_log
+    git fetch origin
     echo "git checkout -f $OFFICIAL_TAG" >> $syzkaller_log
     git checkout -f $OFFICIAL_TAG
     # delete intel qemu next to remind it's qemu official version
@@ -283,6 +285,8 @@ setup_qemu() {
     return 1
   fi
 
+  echo "rm -rf build"
+  echo "rm -rf build" >>  $syzkaller_log
   rm -rf build
   mkdir build
   cd build
