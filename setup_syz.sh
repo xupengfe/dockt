@@ -233,11 +233,21 @@ setup_qemu() {
     }
     echo "rm -rf $qemu_o"
     rm -rf $qemu_o
-    git clone https://github.com/qemu/qemu.git
-    cd $qemu_o
+    if [[ -d "/root/${qemu_o}_bak" ]]; then
+        echo "Folder /root/${qemu_o}_bak exist will move to /root/$qemu_o"
+        echo "Folder /root/${qemu_o}_bak exist will move to /root/$qemu_o" >> $QEMU_LOG
+        mv /root/${qemu_o}_bak /root/$qemu_o
+        echo "git fetch origin"
+        git fetch origin
+    else
+      git clone https://github.com/qemu/qemu.git
+    fi
+    cd $qemu_o || echo "cd $qemu_o failed!!!"
     git checkout -f $OFFICIAL_TAG
     # delete intel qemu next to remind it's qemu official version
-    rm -rf /root/$qemu_i
+    echo "mv /root/$qemu_i /root/${qemu_i}_bak"
+    echo "mv /root/$qemu_i /root/${qemu_i}_bak" >> $QEMU_LOG
+    mv /root/$qemu_i /root/${qemu_i}_bak
   elif [[ "$SOURCE" == "$NEXT" ]]; then
     [[ -d "/root/$qemu_i" ]] && [[ "$result" -eq 1 ]] && {
       echo "$qemu_i amd $qemu folder exist, no need to install"
