@@ -213,15 +213,15 @@ setup_qemu() {
   local result=""
 
   qemu=$(which qemu-system-x86_64)
-  #[[ -z "$qemu" ]] || {
-  #  echo "$qemu exist"
-  #  result=1
+  [[ -z "$qemu" ]] || {
+    echo "$qemu exist"
+    result=1
   #  if [[ "$IGNORE" -eq 2 ]]; then
   #    echo "$qemu exist and IGNORE:$IGNORE, will not reinstall qemu"
   #    echo "$qemu exist and IGNORE:$IGNORE, will not reinstall qemu" >> $syzkaller_log
   #  return 0
   #  fi
-  #}
+  }
 
   cd /root/
 
