@@ -275,6 +275,7 @@ setup_qemu() {
     return 1
   fi
 
+  rm -rf build
   mkdir build
   cd build
   yum install -y ninja-build.x86_64
