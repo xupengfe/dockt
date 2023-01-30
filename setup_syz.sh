@@ -228,10 +228,12 @@ setup_qemu() {
   if [[ "$SOURCE" == "$OFFICIAL" ]]; then
     [[ -d "/root/$qemu_o" ]] && [[ "$result" -eq 1 ]] && {
       echo "$qemu_o and $qemu folder exist, no need to install"
+      echo "$qemu_o and $qemu folder exist, no need to install" >> $QEMU_LOG
       qemu_version_check
       return 0
     }
     echo "rm -rf $qemu_o"
+    echo "rm -rf $qemu_o" >> $QEMU_LOG
     rm -rf $qemu_o
     if [[ -d "/root/${qemu_o}_bak" ]]; then
         echo "Folder /root/${qemu_o}_bak exist will move to /root/$qemu_o"
