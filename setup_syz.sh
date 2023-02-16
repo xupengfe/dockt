@@ -361,7 +361,12 @@ get_image() {
   tar -xvf image.tar.gz
 
   cd /root/image
+  # centos8.img is for syzkaller
+  # centos8_2.img is for issue bisect
   cp -rf /root/image/centos8.img /root/image/centos8_2.img
+  # centos8_2.img is broken sometimes when reproduce issue
+  # Use centos8_3.img backup one to recover centos8_2.img
+  cp -rf /root/image/centos8.img /root/image/centos8_3.img
   if [[ -e "${HOME_PATH}/.ssh/id_rsa.pub" ]]; then
     echo "${HOME_PATH}/.ssh/id_rsa.pub exist, no need regenerate it"
     echo "${HOME_PATH}/.ssh/id_rsa.pub exist, no need regenerate it" >> $syzkaller_log
