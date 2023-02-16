@@ -333,9 +333,9 @@ setup_intel_next_kernel() {
 }
 
 get_image() {
-  img=""
-  pub_content=""
-  bz_file="/root/image/bzImage_5.14-rc5cet"
+  local img=""
+  local pub_content=""
+  local bz_file="/root/image/bzImage_5.14-rc5cet"
 
   [[ "$IGNORE" -eq 1 ]] && {
     echo "IGNORE:$IGNORE is 1, will ignore image installation"
