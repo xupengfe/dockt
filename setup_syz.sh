@@ -86,8 +86,10 @@ install_packages() {
     return 0
   }
 
-  echo "Install useful packages:"
+  echo "Install useful packages:" >> $syzkaller_log
+  echo "yum -y install glibc-devel.i686 glibc-devel"
   yum -y install glibc-devel.i686 glibc-devel
+  echo "yum -y install gcc-c++"
   yum -y install gcc-c++
   yum -y install make
   yum -y install ncurses-devel
@@ -96,20 +98,24 @@ install_packages() {
   yum -y install virt-manager
   yum -y install bison
   yum -y install flex
+  echo "yum -y install ncurses"
   yum -y install ncurses
   yum -y install elfutils-libelf-devel
   yum -y install libcap-devel
   yum -y install openssl-devel
   yum -y install fuse-devel
   dnf -y install libcap-ng-devel
+  echo "dnf -y install numactl-devel"
   dnf -y install numactl-devel
   yum -y install rpm-build rpmdevtools
   yum -y install glibc-devel.i686 glibc-devel
   yum -y install patch
+  echo "yum -y install automake"
   yum -y install automake
   yum -y install libstdc++-devel
   yum -y install libstdc++-static
   yum -y install alsa-lib-devel
+  echo "yum -y install cmake"
   yum -y install cmake
   dnf -y install libusbx-devel
   dnf -y install python2-devel
