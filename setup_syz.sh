@@ -40,21 +40,21 @@ check_syzkaller() {
   local end_commit_tag=""
 
   [[ -e "$TAG_ORIGIN" ]] && end_commit_tag=$(cat "$TAG_ORIGIN")
-  # Only find the screen with setup_syz pids
-  old_pids=$(ps -ef | grep SCREEN | grep setup_syz | awk -F " " '{print $2}')
-  if [[ -z "$old_pid" ]]; then
+  # New init process is also SCREEN or without SCREEN, so don't use SCREEN
+  old_pids=$(ps -ef | grep syz-manager | grep config | awk -F " " '{print $2}')
+  if [[ -z "$old_pids" ]]; then
     echo "No syzkaller pid run" >> "$syzkaller_log"
   elif [[ "$end_commit_tag" != "$TAG" ]]; then
-    echo "Syzkaller pid $old_pid already run but tag:$end_commit_tag is not new:$TAG, reran the syzkaller"
-    echo "Syzkaller pid $old_pid already run but tag:$end_commit_tag is not new:$TAG, reran the syzkaller" >> "$syzkaller_log"
+    echo "Syzkaller pid $old_pids already run but tag:$end_commit_tag is not new:$TAG, reran the syzkaller"
+    echo "Syzkaller pid $old_pids already run but tag:$end_commit_tag is not new:$TAG, reran the syzkaller" >> "$syzkaller_log"
     for pid in $old_pids; do
       echo "kill -9 $pid"
       echo "kill -9 $pid" >> "$syzkaller_log"
       kill -9 "$pid"
     done
   else
-    echo "Syzkaller pid $old_pid already run and END commit tag is same:$TAG, no need set up, exit"
-    echo "Syzkaller pid $old_pid already run and END commit tag is same:$TAG, no need set up, exit" >> "$syzkaller_log"
+    echo "Syzkaller pid $old_pids already run and END commit tag is same:$TAG, no need set up, exit"
+    echo "Syzkaller pid $old_pids already run and END commit tag is same:$TAG, no need set up, exit" >> "$syzkaller_log"
     exit 0
   fi
 }
