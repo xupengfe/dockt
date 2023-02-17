@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export PATH=${PATH}:/root/dockt
+TAG_ORIGIN="/opt/tag_origin"
 syzkaller_log="/root/setup_syzkaller.log"
 IMAGE="/root/image/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
@@ -34,14 +35,26 @@ __EOF
 }
 
 check_syzkaller() {
-  old_pid=""
+  local old_pids=""
+  local pid=""
+  local end_commit_tag=""
 
-  old_pid=$(ps -ef | grep syz-manager | grep config | awk -F " " '{print $2}')
+  [[ -e "$TAG_ORIGIN" ]] && end_commit_tag=$(cat "$TAG_ORIGIN")
+  # Only find the screen with setup_syz pids
+  old_pids=$(ps -ef | grep SCREEN | grep setup_syz | awk -F " " '{print $2}')
   if [[ -z "$old_pid" ]]; then
     echo "No syzkaller pid run" >> "$syzkaller_log"
+  elif [[ "$end_commit_tag" != "$TAG" ]]; then
+    echo "Syzkaller pid $old_pid already run but tag:$end_commit_tag is not new:$TAG, reran the syzkaller"
+    echo "Syzkaller pid $old_pid already run but tag:$end_commit_tag is not new:$TAG, reran the syzkaller" >> "$syzkaller_log"
+    for pid in $old_pids; do
+      echo "kill -9 $pid"
+      echo "kill -9 $pid" >> "$syzkaller_log"
+      kill -9 "$pid"
+    done
   else
-    echo "Syzkaller pid $old_pid already run, no need set up, exit"
-    echo "Syzkaller pid $old_pid already run, no need set up, exit" >> "$syzkaller_log"
+    echo "Syzkaller pid $old_pid already run and END commit tag is same:$TAG, no need set up, exit"
+    echo "Syzkaller pid $old_pid already run and END commit tag is same:$TAG, no need set up, exit" >> "$syzkaller_log"
     exit 0
   fi
 }
@@ -569,6 +582,7 @@ while getopts :s:f:i:t:k:b:h arg; do
       IGNORE=$OPTARG
       ;;
     t)
+      # END COMMIT TAG or END COMMIT can be used, END COMMIT TAG is recommended
       TAG=$OPTARG
       ;;
     k)
