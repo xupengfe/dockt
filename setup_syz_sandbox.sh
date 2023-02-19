@@ -536,8 +536,8 @@ next_to_do() {
   if [[ -n "$TAG" ]]; then
     if [[ -n "$KER_PATH" ]]; then
       if [[ -n "$START_COMMIT" ]]; then
-        echo "/root/bzimage_bisect/run_syzkaller.sh $TAG $KER_PATH $START_COMMIT" >> "$syzkaller_log"
-        /root/bzimage_bisect/run_syzkaller.sh "$TAG" "$KER_PATH" "$START_COMMIT"
+        echo "/root/bzimage_bisect/run_syzkaller.sh $TAG $KER_PATH $START_COMMIT" "$NEXT_BASE_TAG" >> "$syzkaller_log"
+        /root/bzimage_bisect/run_syzkaller.sh "$TAG" "$KER_PATH" "$START_COMMIT" "$NEXT_BASE_TAG"
       else
         echo  "KER:$KER_PATH contain value but no START_COMMIT:$START_COMMIT"
         echo  "KER:$KER_PATH contain value but no START_COMMIT:$START_COMMIT" >> "$syzkaller_log"
@@ -580,7 +580,7 @@ main() {
 : "${SOURCE:=i}"
 : "${IGNORE:=0}"
 : "${FORCE:=0}"
-while getopts :s:f:i:t:k:b:h arg; do
+while getopts :s:f:i:t:k:b:n:h arg; do
   case $arg in
     s)
       SOURCE=$OPTARG
@@ -599,8 +599,14 @@ while getopts :s:f:i:t:k:b:h arg; do
       KER_PATH=$OPTARG
       ;;
     b)
-      # based start commit
+      # based start commit or tag both is ok
       START_COMMIT=$OPTARG
+      ;;
+    n)
+      # If developed and mainline commit reproduced this issue both, will use
+      # next base commit, for example v6.1-intel-next -> v6.1 -> v5.11(next)
+      # Next base commit or next base tag is both ok.
+      NEXT_BASE_TAG=$OPTARG
       ;;
     h)
       usage
