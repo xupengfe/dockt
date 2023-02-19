@@ -2,6 +2,7 @@
 
 export PATH=${PATH}:/root/dockt
 TAG_ORIGIN="/opt/tag_origin"
+SCOM_FILE="/opt/start_commit"
 syzkaller_log="/root/setup_syzkaller.log"
 IMAGE="/root/image/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
@@ -24,7 +25,7 @@ usage() {
   cat <<__EOF
   usage: ./${0##*/} [-s o|i][-f [0|1][-i 0|1][-t][-k][-b][-h]
   -s  Source: o means official, i means intel-next (default i)
-  -f  Force: 0 no reinstall if exist, 1 reinstall image (default 0)
+  -f  Force: 0 no reinstall if exist, 1 reinstall image, 2 reran syzkaller anyway (default 0)
   -i  Ignore:0 will fully installation, 1 ignore rpm and image installation, i:2 will ignore qemu if exist(default 0)
   -t  Commit with head(End commit)
   -k  Develop Kernel path, if intel-next kernel no need set, will download in /root/os.linux.intelnext.kernel/ automatically
@@ -38,12 +39,22 @@ check_syzkaller() {
   local old_pids=""
   local pid=""
   local end_commit_tag=""
+  local start_commit=""
 
   [[ -e "$TAG_ORIGIN" ]] && end_commit_tag=$(cat "$TAG_ORIGIN")
+  [[ -e "$SCOM_FILE" ]] && start_commit=$(cat "$SCOM_FILE")
   # New init process is also SCREEN or without SCREEN, so don't use SCREEN
   old_pids=$(ps -ef | grep syz-manager | grep config | awk -F " " '{print $2}')
   if [[ -z "$old_pids" ]]; then
     echo "No syzkaller pid run" >> "$syzkaller_log"
+  elif [[ "$FORCE" -eq 2 ]]; then
+    echo "pid $old_pids, tag:$end_commit_tag,new:$TAG, base commit:$start_commit,new:$START_COMMIT;FORCE:$FORCE, reran syzkaller!"
+    echo "pid $old_pids, tag:$end_commit_tag,new:$TAG, base commit:$start_commit,new:$START_COMMIT;FORCE:$FORCE, reran syzkaller!" >> "$syzkaller_log"
+    for pid in $old_pids; do
+      echo "kill -9 $pid"
+      echo "kill -9 $pid" >> "$syzkaller_log"
+      kill -9 "$pid"
+    done
   elif [[ "$end_commit_tag" != "$TAG" ]]; then
     echo "Syzkaller pid $old_pids already run but tag:$end_commit_tag is not new:$TAG, reran the syzkaller"
     echo "Syzkaller pid $old_pids already run but tag:$end_commit_tag is not new:$TAG, reran the syzkaller" >> "$syzkaller_log"
