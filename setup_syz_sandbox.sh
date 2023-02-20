@@ -79,7 +79,7 @@ get_repo() {
   yum install -y git
 
   if [[ -d "$bz" ]]; then
-    bz_git_check=$(cat ${bz}/.git/config | grep intel | grep sandbox | bzimage_bisect)
+    bz_git_check=$(cat ${bz}/.git/config | grep intel | grep sandbox | grep bzimage_bisect)
     if [[ -z "$bz_git_check" ]]; then
       echo "$bz is not intel sandbox, will refetch repo" >> "$syzkaller_log"
       rm -rf "$bz"
