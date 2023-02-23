@@ -20,6 +20,8 @@ NEXT="i"
 OFFICIAL_TAG="v7.1.0"
 HTML_FOLDER="/var/www/html"
 
+readonly DEFAULT_DEST="/var/www/html/bzimage"
+
 usage() {
   cat <<__EOF
   usage: ./${0##*/} [-s o|i][-f [0|1][-i 0|1][-t][-k][-b][-h]
@@ -536,16 +538,16 @@ next_to_do() {
   if [[ -n "$TAG" ]]; then
     if [[ -n "$KER_PATH" ]]; then
       if [[ -n "$START_COMMIT" ]]; then
-        echo "/root/bzimage_bisect/run_syzkaller.sh $TAG $KER_PATH $START_COMMIT" "$NEXT_BASE_TAG" >> "$syzkaller_log"
-        /root/bzimage_bisect/run_syzkaller.sh "$TAG" "$KER_PATH" "$START_COMMIT" "$NEXT_BASE_TAG"
+        echo "/root/bzimage_bisect/run_syzkaller.sh -e $TAG -k $KER_PATH -b $START_COMMIT -d $DEST -n $NEXT_BASE_TAG" >> "$syzkaller_log"
+        /root/bzimage_bisect/run_syzkaller.sh -e "$TAG" -k "$KER_PATH" -b "$START_COMMIT" -d "$DEST" -n "$NEXT_BASE_TAG"
       else
         echo  "KER:$KER_PATH contain value but no START_COMMIT:$START_COMMIT"
         echo  "KER:$KER_PATH contain value but no START_COMMIT:$START_COMMIT" >> "$syzkaller_log"
-        /root/bzimage_bisect/run_syzkaller.sh "$TAG"
+        /root/bzimage_bisect/run_syzkaller.sh -e "$TAG"
       fi
     else
-      echo "/root/bzimage_bisect/run_syzkaller.sh $TAG" >> "$syzkaller_log"
-      /root/bzimage_bisect/run_syzkaller.sh "$TAG"
+      echo "/root/bzimage_bisect/run_syzkaller.sh -e $TAG" >> "$syzkaller_log"
+      /root/bzimage_bisect/run_syzkaller.sh -e "$TAG"
     fi
 
   else
@@ -556,9 +558,9 @@ next_to_do() {
 }
 
 main() {
-  echo "$(date +%Y-%m-%d_%H:%M:%S): SOURCE:$SOURCE|FORCE:$FORCE|IGNORE:$IGNORE|TAG:$TAG|KER:$KER_PATH|START_COMMIT:$START_COMMIT"
+  echo "$(date +%Y-%m-%d_%H:%M:%S):SRC:$SOURCE|FORCE:$FORCE|IGN:$IGNORE|TAG:$TAG|KER:$KER_PATH|base:$START_COMMIT|$DEST|$NEXT_BASE_TAG"
   echo "====================" >> "$syzkaller_log"
-  echo "$(date +%Y-%m-%d_%H:%M:%S): SOURCE:$SOURCE|FORCE:$FORCE|IGNORE:$IGNORE|TAG:$TAG|KER:$KER_PATH|START_COMMIT:$START_COMMIT" >> "$syzkaller_log"
+  echo "$(date +%Y-%m-%d_%H:%M:%S):SRC:$SOURCE|FORCE:$FORCE|IGN:$IGNORE|TAG:$TAG|KER:$KER_PATH|base:$START_COMMIT|$DEST|$NEXT_BASE_TAG" >> "$syzkaller_log"
 
   if [[ -z "$KER_PATH" ]]; then
     KER_PATH=$KERNEL_PATH
@@ -577,10 +579,10 @@ main() {
 
 
 # Set detault value
-: "${SOURCE:=i}"
+: "${SOURCE:=o}"
 : "${IGNORE:=0}"
 : "${FORCE:=0}"
-while getopts :s:f:i:t:k:b:n:h arg; do
+while getopts :s:f:i:t:k:b:d:n:h arg; do
   case $arg in
     s)
       SOURCE=$OPTARG
@@ -601,6 +603,15 @@ while getopts :s:f:i:t:k:b:n:h arg; do
     b)
       # based start commit or tag both is ok
       START_COMMIT=$OPTARG
+      ;;
+    d)
+      # destination like default /var/www/html/bzimage
+      DEST=$OPTARG
+      [[ -z "$DEST" ]] && {
+        echo "DEST:$DEST is null use default:$DEFAULT_DEST"
+        echo "DEST:$DEST is null use default:$DEFAULT_DEST" >> "$syzkaller_log"
+        DEST=$DEFAULT_DEST
+      }
       ;;
     n)
       # If developed and mainline commit reproduced this issue both, will use
