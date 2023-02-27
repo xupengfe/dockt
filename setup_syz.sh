@@ -116,6 +116,8 @@ install_packages() {
   echo "yum -y install gcc-c++"
   yum -y install gcc-c++
   yum -y install make
+  echo "yum -y install go"
+  yum -y install go
   yum -y install ncurses-devel
   dnf -y update kernel rpm libsolv
   yum -y install net-tools
