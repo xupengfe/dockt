@@ -564,6 +564,8 @@ main() {
   echo "====================" >> "$syzkaller_log"
   echo "$(date +%Y-%m-%d_%H:%M:%S):SRC:$SOURCE|FORCE:$FORCE|IGN:$IGNORE|TAG:$TAG|KER:$KER_PATH|base:$START_COMMIT|$DEST|$NEXT_BASE_TAG" >> "$syzkaller_log"
 
+  echo "rm -rf /root/screenlog.0" >> "$syzkaller_log"
+  rm -rf /root/screenlog.0
   if [[ -z "$KER_PATH" ]]; then
     KER_PATH=$KERNEL_PATH
     echo "KER_PATH is null, use $KERNEL_PATH as default" >> "$syzkaller_log"
