@@ -568,6 +568,7 @@ main() {
   echo "$(date +%Y-%m-%d_%H:%M:%S): bash /root/setup_syz.sh -s $SOURCE -k $KER_PATH -t $TAG -b $START_COMMIT -n $NEXT_BASE_TAG -d $DEST" >> "$RUN_SYZ_LOG"
   echo "rm -rf /root/screenlog.0" >> "$syzkaller_log"
   rm -rf /root/screenlog.0
+  cat /dev/null > /root/screenlog.0
   if [[ -z "$KER_PATH" ]]; then
     KER_PATH=$KERNEL_PATH
     echo "KER_PATH is null, use $KERNEL_PATH as default" >> "$syzkaller_log"
