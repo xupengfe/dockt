@@ -19,6 +19,8 @@ OFFICIAL="o"
 NEXT="i"
 OFFICIAL_TAG="v7.1.0"
 HTML_FOLDER="/var/www/html"
+# It only saved the run_syz by scan_bisect script records
+RUN_SYZ_LOG="/root/run_syz_scan.log"
 
 readonly DEFAULT_DEST="/var/www/html/bzimage"
 
@@ -563,7 +565,7 @@ main() {
   echo "$(date +%Y-%m-%d_%H:%M:%S):SRC:$SOURCE|FORCE:$FORCE|IGN:$IGNORE|TAG:$TAG|KER:$KER_PATH|base:$START_COMMIT|$DEST|$NEXT_BASE_TAG"
   echo "====================" >> "$syzkaller_log"
   echo "$(date +%Y-%m-%d_%H:%M:%S):SRC:$SOURCE|FORCE:$FORCE|IGN:$IGNORE|TAG:$TAG|KER:$KER_PATH|base:$START_COMMIT|$DEST|$NEXT_BASE_TAG" >> "$syzkaller_log"
-
+  echo "$(date +%Y-%m-%d_%H:%M:%S): bash /root/setup_syz.sh -s $SOURCE -k $KER_PATH -t $TAG -b $START_COMMIT -n $NEXT_BASE_TAG -d $DEST" >> "$RUN_SYZ_LOG"
   echo "rm -rf /root/screenlog.0" >> "$syzkaller_log"
   rm -rf /root/screenlog.0
   if [[ -z "$KER_PATH" ]]; then
