@@ -178,6 +178,15 @@ install_packages() {
   yum -y install spice-server-devel.x86_64
   yum -y install usbredir-devel.x86_64
   yum -y install screen
+  yum -y install python3.8
+  local check_py=""
+  check_py=$(python3 --version | grep "3\.8")
+  [[ -z "$check_py" ]] && {
+    [[ -e "/usr/bin/python3.8" ]] && {
+      rm -rf /usr/bin/python3
+      ln -s /usr/bin/python3.8 /usr/bin/python3
+    }
+  }
   # syz-prog2c need to use clang-format
   yum install -y clang-tools-extra
   httpd_result=$(which httpd 2>/dev/null)
