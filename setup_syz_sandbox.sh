@@ -336,7 +336,8 @@ setup_qemu() {
   mkdir build
   cd build
   yum install -y ninja-build.x86_64
-  ../configure --target-list=x86_64-softmmu --enable-kvm --enable-vnc --enable-gtk --enable-sdl
+  # yum -y install libslirp-devel.x86_64    // installed in previous step
+  ../configure --target-list=x86_64-softmmu --enable-kvm --enable-vnc --enable-gtk --enable-sdl --enable-usb-redir --enable-slirp
   make
   make install
   qemu_version_check
