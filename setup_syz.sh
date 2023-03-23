@@ -118,6 +118,7 @@ install_packages() {
   yum -y install make
   echo "yum -y install go"
   yum -y install go
+  yum -y install libslirp-devel.x86_64
   yum -y install ncurses-devel
   dnf -y update kernel rpm libsolv
   yum -y install net-tools
