@@ -416,9 +416,9 @@ check_img_update() {
     wget ${start_vm_path}/start3.sh -O ${IMG_PATH}/start3.sh
   fi
 
-  check_start_vm=$(grep "OVMF" ${IMG_PATH}/start2.sh | grep -v "^#")
+  check_start_vm=$(grep "OVMF" ${IMG_PATH}/my.cfg | grep -v "^#")
   if [[ -z "$check_start_vm" ]]; then
-    echo "$(date): no OVMF:$check_start_vm in ${IMG_PATH}/start2.sh" >> $syzkaller_log
+    echo "$(date): no OVMF:$check_start_vm in ${IMG_PATH}/my.cfg" >> $syzkaller_log
     echo "wget $my_cfg_link -O ${IMG_PATH}/my.cfg" >> $syzkaller_log
     wget "$my_cfg_link" -O "${IMG_PATH}/my.cfg"
   fi
