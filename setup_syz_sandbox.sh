@@ -3,13 +3,14 @@
 TAG_ORIGIN="/opt/tag_origin"
 SCOM_FILE="/opt/start_commit"
 syzkaller_log="/root/setup_syzkaller.log"
-IMAGE="/root/image/centos8.img"
+IMG_PATH="/root/image"
+IMAGE="${IMG_PATH}/centos8.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
 INTEL_NEXT="https://github.com/intel-innersource/os.linux.intelnext.kernel.git"
 KERNEL_PATH="/root/os.linux.intelnext.kernel"
 DEFAULT_PORT="10022"
 HOME_PATH=$(echo $HOME)
-IMAGE="/root/image/centos8_2.img"
+IMAGE2="${IMG_PATH}/centos8_2.img"
 BZ_PATH="/root/bzimage_bisect"
 SCAN_SCRIPT="scan_bisect.sh"
 SCAN_SRV="scansyz.service"
@@ -378,10 +379,55 @@ setup_intel_next_kernel() {
   fi
 }
 
+# Check some image update if image exists
+check_img_update() {
+  local ovmf_file="OVMF_CODE.fd"
+  local check_cfg=""
+  local check_start_vm=""
+  local my_cfg_link="https://raw.githubusercontent.com/xupengfe/dockt/main/my.cfg"
+  local start_vm_path="http://xpf-desktop.sh.intel.com/syzkaller/image/"
+  local ovmf_link="https://github.com/xupengfe/dockt/raw/main/OVMF_CODE.fd"
+
+  [[ -e "${IMG_PATH}/my.cfg" ]] || {
+    echo "No ${IMG_PATH}/my.cfg file, exit!"
+    echo "No ${IMG_PATH}/my.cfg file, exit!" >> $syzkaller_log
+    exit 1
+  }
+
+  [[ -e "${IMG_PATH}/${ovmf_file}" ]] || {
+    echo "$(date): no $ovmf_file file in ${IMG_PATH}, get it!" >> $syzkaller_log
+    echo "wget $ovmf_link -O ${IMG_PATH}/${ovmf_file}" >> $syzkaller_log
+    wget $ovmf_link -O ${IMG_PATH}/${ovmf_file}
+  }
+
+  [[ -e "$ovmf_file" ]] || {
+    echo "$(date): no $ovmf_file file in ${IMG_PATH} after get $ovmf_file! Exit!" >> $syzkaller_log
+    exit 1
+  }
+
+  check_cfg=$(grep "qemu_args" ${IMG_PATH}/start2.sh)
+  if [[ -z "$check_cfg" ]]; then
+    echo "$(date): no qemu_args:$check_cfg in ${IMG_PATH}/start2.sh" >> $syzkaller_log
+    echo "wget ${start_vm_path}/start1.sh -O ${IMG_PATH}/start1.sh" >> $syzkaller_log
+    wget ${start_vm_path}/start1.sh -O ${IMG_PATH}/start1.sh
+    echo "wget ${start_vm_path}/start2.sh -O ${IMG_PATH}/start2.sh" >> $syzkaller_log
+    wget ${start_vm_path}/start2.sh -O ${IMG_PATH}/start2.sh
+    echo "wget ${start_vm_path}/start3.sh -O ${IMG_PATH}/start3.sh" >> $syzkaller_log
+    wget ${start_vm_path}/start3.sh -O ${IMG_PATH}/start3.sh
+  fi
+
+  check_start_vm=$(grep "OVMF" ${IMG_PATH}/start2.sh | grep -v "^#")
+  if [[ -z "$check_start_vm" ]]; then
+    echo "$(date): no OVMF:$check_start_vm in ${IMG_PATH}/start2.sh" >> $syzkaller_log
+    echo "wget $my_cfg_link -O ${IMG_PATH}/my.cfg" >> $syzkaller_log
+    wget "$my_cfg_link" -O "${IMG_PATH}/my.cfg"
+  fi
+}
+
 get_image() {
   local img=""
   local pub_content=""
-  local bz_file="/root/image/bzImage_5.14-rc5cet"
+  local bz_file="${IMG_PATH}/bzImage_5.14-rc5cet"
 
   [[ "$IGNORE" -eq 1 ]] && {
     echo "IGNORE:$IGNORE is 1, will ignore image installation"
@@ -397,6 +443,7 @@ get_image() {
   img=$(ls "$IMAGE" 2>/dev/null)
   [[ -z "$img" ]] || {
     echo "$img exist, don't need to get image again"
+    check_img_update
     return 0
   }
 
@@ -406,13 +453,13 @@ get_image() {
   wget http://xpf-desktop.sh.intel.com/syzkaller/image.tar.gz
   tar -xvf image.tar.gz
 
-  cd /root/image
+  cd ${IMG_PATH}
   # centos8.img is for syzkaller
   # centos8_2.img is for issue bisect
-  cp -rf /root/image/centos8.img /root/image/centos8_2.img
+  cp -rf ${IMG_PATH}/centos8.img ${IMG_PATH}/centos8_2.img
   # centos8_2.img is broken sometimes when reproduce issue
   # Use centos8_3.img backup one to recover centos8_2.img
-  cp -rf /root/image/centos8.img /root/image/centos8_3.img
+  cp -rf ${IMG_PATH}/centos8.img ${IMG_PATH}/centos8_3.img
   if [[ -e "${HOME_PATH}/.ssh/id_rsa.pub" ]]; then
     echo "${HOME_PATH}/.ssh/id_rsa.pub exist, no need regenerate it"
     echo "${HOME_PATH}/.ssh/id_rsa.pub exist, no need regenerate it" >> $syzkaller_log
@@ -444,11 +491,11 @@ get_image() {
   sleep 20
   rm -rf /root/.ssh/known_hosts
   # could not send the variable value to remote VM, so set value directly
-  echo "ssh -i /root/image/id_rsa_cent -o ConnectTimeout=1 -o 'StrictHostKeyChecking no' -p 10022 localhost 'echo \"$pub_content\" > ~/.ssh/authorized_keys'" > /root/image/pub.sh
-  chmod 755 /root/image/pub.sh
-  /root/image/pub.sh
+  echo "ssh -i ${IMG_PATH}/id_rsa_cent -o ConnectTimeout=1 -o 'StrictHostKeyChecking no' -p 10022 localhost 'echo \"$pub_content\" > ~/.ssh/authorized_keys'" > ${IMG_PATH}/pub.sh
+  chmod 755 ${IMG_PATH}/pub.sh
+  ${IMG_PATH}/pub.sh
 
-  ssh -i /root/image/id_rsa_cent -o ConnectTimeout=1 -o 'StrictHostKeyChecking no' -p $DEFAULT_PORT localhost 'cat ~/.ssh/authorized_keys'
+  ssh -i ${IMG_PATH}/id_rsa_cent -o ConnectTimeout=1 -o 'StrictHostKeyChecking no' -p $DEFAULT_PORT localhost 'cat ~/.ssh/authorized_keys'
   scp -o 'StrictHostKeyChecking no' -P $DEFAULT_PORT ${HOME_PATH}/.ssh/id_rsa.pub root@localhost:/root/
   sleep 1
   clean_old_vm
@@ -545,7 +592,7 @@ next_to_do() {
   echo "Set up log: $syzkaller_log"
   echo "Install syzkaller environment successfully. Next follow below to run syzkaller:"
   echo "$(date +%Y-%m-%d_%H%M%S): The syzkaller environment has been set up successfully" >> "$syzkaller_log"
-  echo "cd /root/image"
+  echo "cd ${IMG_PATH}"
   echo "syz-manager --config my.cfg"
 
   start_scan_service
@@ -567,7 +614,7 @@ next_to_do() {
 
   else
     echo "No TAG:$TAG, run syzkaller as default" >> "$syzkaller_log"
-    cd /root/image
+    cd ${IMG_PATH}
     syz-manager --config my.cfg
   fi
 }
