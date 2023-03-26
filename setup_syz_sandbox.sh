@@ -400,7 +400,7 @@ check_img_update() {
     wget $ovmf_link -O ${IMG_PATH}/${ovmf_file}
   }
 
-  [[ -e "$ovmf_file" ]] || {
+  [[ -e "${IMG_PATH}/${ovmf_file}" ]] || {
     echo "$(date): no $ovmf_file file in ${IMG_PATH} after get $ovmf_file! Exit!" >> $syzkaller_log
     exit 1
   }
