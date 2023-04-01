@@ -523,6 +523,12 @@ install_syzkaller() {
     echo "No $SYZ_FOLDER, will install syzkaller in first time" >> $syzkaller_log
   fi
 
+  check_run_syz=$(cat $bashrc | grep "check_run_syz")
+  [[ -n "$check_run_syz" ]] || {
+    echo "$(date) | Add /root/bzimage_bisect/check_run_syz.sh i in $bashrc" >> "$syzkaller_log"
+    echo "/root/bzimage_bisect/check_run_syz.sh i" >> $bashrc
+  }
+
   check_syz=$(which syz-manager)
   [[ -z "$check_syz" ]] || {
     echo "$check_syz exist"
@@ -538,12 +544,6 @@ install_syzkaller() {
   cd syzkaller
   mkdir workdir
   make
-
-  check_run_syz=$(cat $bashrc | grep "check_run_syz")
-  [[ -n "$check_run_syz" ]] || {
-    echo "$(date) | Add /root/bzimage_bisect/check_run_syz.sh i in $bashrc" >> "$syzkaller_log"
-    echo "/root/bzimage_bisect/check_run_syz.sh i" >> $bashrc
-  }
 
   check_env=$(cat $bashrc | grep "syzkaller")
   [[ -n "$check_env" ]] || {
