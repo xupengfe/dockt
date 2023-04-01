@@ -506,12 +506,16 @@ get_image() {
 install_syzkaller() {
   check_syz=""
   check_env=""
+  check_run_syz=""
   bashrc="/root/.bashrc"
 
   # Each time set up or run, will update syzkaller to latest!
   if [[ -d "$SYZ_FOLDER" ]]; then
     echo "cd $SYZ_FOLDER; git pull; make" >> $syzkaller_log
-    cd $SYZ_FOLDER
+    cd $SYZ_FOLDER || {
+      echo "No $SYZ_FOLDER folder, exit"
+      exit 1
+    }
     git pull
     make
     sleep 1
@@ -524,19 +528,30 @@ install_syzkaller() {
     echo "$check_syz exist"
     return 0
   }
-  cd /root/
+  cd /root/ || {
+    echo "No /root, exit"
+    echo "No /root, exit" >> "$syzkaller_log"
+    exit 1
+  }
   yum -y install go
   git clone https://github.com/google/syzkaller.git
   cd syzkaller
   mkdir workdir
   make
-  check_env=$(cat $bashrc | grep syzkaller)
+
+  check_run_syz=$(cat $bashrc | grep "check_run_syz")
+  [[ -n "$check_run_syz" ]] || {
+    echo "/root/bzimage_bisect/check_run_syz.sh i" >> $bashrc
+  }
+
+  check_env=$(cat $bashrc | grep "syzkaller")
   [[ -n "$check_env" ]] || {
     echo "export PATH=/root/syzkaller/bin:\$PATH" >> $bashrc
     echo "export PATH=/root/syzkaller/bin/linux_amd64:\$PATH" >> $bashrc
     echo "export PATH=/usr/local/bin:\$PATH" >> $bashrc
     source $bashrc
   }
+
 }
 
 install_vncserver() {
