@@ -405,9 +405,9 @@ check_img_update() {
     exit 1
   }
 
-  check_cfg=$(grep "qemu_args" ${IMG_PATH}/start2.sh)
+  check_cfg=$(grep "OVMF" ${IMG_PATH}/start2.sh)
   if [[ -z "$check_cfg" ]]; then
-    echo "$(date): no qemu_args:$check_cfg in ${IMG_PATH}/start2.sh" >> $syzkaller_log
+    echo "$(date): no OVMF:$check_cfg in ${IMG_PATH}/start2.sh" >> $syzkaller_log
     echo "wget ${start_vm_path}/start1.sh -O ${IMG_PATH}/start1.sh" >> $syzkaller_log
     wget ${start_vm_path}/start1.sh -O ${IMG_PATH}/start1.sh
     echo "wget ${start_vm_path}/start2.sh -O ${IMG_PATH}/start2.sh" >> $syzkaller_log
@@ -416,9 +416,9 @@ check_img_update() {
     wget ${start_vm_path}/start3.sh -O ${IMG_PATH}/start3.sh
   fi
 
-  check_start_vm=$(grep "OVMF" ${IMG_PATH}/my.cfg | grep -v "^#")
+  check_start_vm=$(grep "qemu_args" ${IMG_PATH}/my.cfg | grep -v "^#")
   if [[ -z "$check_start_vm" ]]; then
-    echo "$(date): no OVMF:$check_start_vm in ${IMG_PATH}/my.cfg" >> $syzkaller_log
+    echo "$(date): no qemu_args:$check_start_vm in ${IMG_PATH}/my.cfg" >> $syzkaller_log
     echo "wget $my_cfg_link -O ${IMG_PATH}/my.cfg" >> $syzkaller_log
     wget "$my_cfg_link" -O "${IMG_PATH}/my.cfg"
   fi
