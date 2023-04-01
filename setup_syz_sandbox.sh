@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=${PATH}:/usr/local/bin:/root/syzkaller/bin/linux_amd64:/root/syzkaller/bin:/opt/intel/bin64:/opt/intel/android_target:/usr/share/Modules/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/bin
+
 TAG_ORIGIN="/opt/tag_origin"
 SCOM_FILE="/opt/start_commit"
 syzkaller_log="/root/setup_syzkaller.log"
