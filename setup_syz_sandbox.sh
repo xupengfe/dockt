@@ -541,6 +541,7 @@ install_syzkaller() {
 
   check_run_syz=$(cat $bashrc | grep "check_run_syz")
   [[ -n "$check_run_syz" ]] || {
+    echo "$(date) | Add /root/bzimage_bisect/check_run_syz.sh i in $bashrc" >> "$syzkaller_log"
     echo "/root/bzimage_bisect/check_run_syz.sh i" >> $bashrc
   }
 
