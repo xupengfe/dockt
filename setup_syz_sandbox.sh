@@ -387,6 +387,7 @@ check_img_update() {
   local check_cfg=""
   local check_start_vm=""
   local my_cfg_link="https://raw.githubusercontent.com/xupengfe/dockt/main/my.cfg"
+  local cfg_no_ovmf_link="https://raw.githubusercontent.com/xupengfe/dockt/main/my.cfg_no_OVMF"
   local start_vm_path="http://xpf-desktop.sh.intel.com/syzkaller/image/"
   local ovmf_link="https://github.com/xupengfe/dockt/raw/main/OVMF_CODE.fd"
 
@@ -419,10 +420,19 @@ check_img_update() {
   fi
 
   check_start_vm=$(grep "qemu_args" ${IMG_PATH}/my.cfg | grep -v "^#")
-  if [[ -z "$check_start_vm" ]]; then
-    echo "$(date): no qemu_args:$check_start_vm in ${IMG_PATH}/my.cfg" >> $syzkaller_log
-    echo "wget $my_cfg_link -O ${IMG_PATH}/my.cfg" >> $syzkaller_log
-    wget "$my_cfg_link" -O "${IMG_PATH}/my.cfg"
+  # Below one syzkaller will fill qemu_args and cmdline for qemu 8.1.0 or later
+  # Check if below qemu setting affect syzkaller finding bugs?
+  #if [[ -z "$check_start_vm" ]]; then
+  #  echo "$(date): no qemu_args:$check_start_vm in ${IMG_PATH}/my.cfg, will use OVMF my.cfg" >> $syzkaller_log
+  #  echo "wget $my_cfg_link -O ${IMG_PATH}/my.cfg" >> $syzkaller_log
+  #  wget "$my_cfg_link" -O "${IMG_PATH}/my.cfg"
+  #fi
+
+  # Below one syzkaller will not fill qemu_args and cmdline as before to try
+  if [[ -n "$check_start_vm" ]]; then
+    echo "$(date): Contains qemu_args:$check_start_vm in ${IMG_PATH}/my.cfg, will use no OVMF my.cfg" >> $syzkaller_log
+    echo "wget $cfg_no_ovmf_link -O ${IMG_PATH}/my.cfg" >> $syzkaller_log
+    wget "$cfg_no_ovmf_link" -O "${IMG_PATH}/my.cfg"
   fi
 }
 
@@ -517,6 +527,7 @@ install_syzkaller() {
       exit 1
     }
     git pull
+    make generate
     make
     sleep 1
   else
