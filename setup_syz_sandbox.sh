@@ -256,6 +256,25 @@ qemu_version_check() {
   fi
 }
 
+install_ninja() {
+  local result=""
+
+  ninja --version
+  result=$?
+  if [[ "$result" -ne 0 ]]; then
+    echo "No ninja tool, install it" >> "$syzkaller_log"
+    git clone https://github.com/ninja-build/ninja.git
+    cd ninja || {
+      echo "Access ninja failed"
+      echo "Access ninja failed" >> "$syzkaller_log"
+    }
+    ./configure.py --bootstrap
+    sudo cp ninja /usr/local/bin/
+  else
+    echo "ninja is installed, no need to reinstall." >> "$syzkaller_log"
+  fi
+}
+
 setup_qemu() {
   local qemu=""
   local qemu_o="qemu"
@@ -339,6 +358,11 @@ setup_qemu() {
   mkdir build
   cd build
   yum install -y ninja-build.x86_64
+  install_ninja
+  cd - && {
+    echo "pwd:$(pwd)"
+    echo "pwd:$(pwd)" >> "$syzkaller_log"
+  }
   # yum -y install libslirp-devel.x86_64    // installed in previous step
   ../configure --target-list=x86_64-softmmu --enable-kvm --enable-vnc --enable-gtk --enable-sdl --enable-usb-redir --enable-slirp
   make
