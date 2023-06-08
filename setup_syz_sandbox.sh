@@ -181,6 +181,7 @@ install_packages() {
   yum -y install spice-server.x86_64
   yum -y install spice-server-devel.x86_64
   yum -y install usbredir-devel.x86_64
+  yum -y groupinstall "Development Tools"
   yum -y install screen
   yum -y install python3.8
   local check_py=""
