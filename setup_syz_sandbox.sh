@@ -276,6 +276,30 @@ install_ninja() {
   fi
 }
 
+install_usbredir() {
+  local result=""
+
+  pkg-config --modversion libusbredirparser-0.5
+  result=$?
+  if [[ "$result" -ne 0 ]]; then
+    echo "No libusbredirparser-0.5 tool, install it" >> "$syzkaller_log"
+    git clone https://gitlab.freedesktop.org/spice/usbredir.git
+    cd usbredir || {
+      echo "Access usbredir failed"
+      echo "Access usbredir failed" >> "$syzkaller_log"
+    }
+    meson build
+    ninja -C build install
+    pkg-config --modversion libusbredirparser-0.5
+    result=$?
+    [[ "$result" -ne 0 ]] && {
+      echo "[ERROR] Install libusbredirparser-0.5 and still failed!!" >> "$syzkaller_log"
+    }
+  else
+    echo "libusbredirparser-0.5 is installed, no need to reinstall." >> "$syzkaller_log"
+  fi
+}
+
 setup_qemu() {
   local qemu=""
   local qemu_o="qemu"
@@ -362,7 +386,12 @@ setup_qemu() {
   install_ninja
   cd - && {
     echo "pwd:$(pwd)"
-    echo "pwd:$(pwd)" >> "$syzkaller_log"
+    echo "After install ninja pwd:$(pwd)" >> "$syzkaller_log"
+  }
+  install_usbredir
+  cd - && {
+    echo "pwd:$(pwd)"
+    echo "After install usbredir pwd:$(pwd)" >> "$syzkaller_log"
   }
   # yum -y install libslirp-devel.x86_64    // installed in previous step
   ../configure --target-list=x86_64-softmmu --enable-kvm --enable-vnc --enable-gtk --enable-sdl --enable-usb-redir --enable-slirp
