@@ -473,7 +473,7 @@ check_img_update() {
     wget ${start_vm_path}/start3.sh -O ${IMG_PATH}/start3.sh
   fi
 
-  check_start_vm=$(grep "qemu_args" ${IMG_PATH}/my.cfg | grep -v "^#")
+  check_start_vm=$(grep "qemu_args" ${IMG_PATH}/my.cfg | grep -v "^#" | grep -i OVMF)
   # Below one syzkaller will fill qemu_args and cmdline for qemu 8.1.0 or later
   # Check if below qemu setting affect syzkaller finding bugs?
   #if [[ -z "$check_start_vm" ]]; then
@@ -484,7 +484,7 @@ check_img_update() {
 
   # Below one syzkaller will not fill qemu_args and cmdline as before to try
   if [[ -n "$check_start_vm" ]]; then
-    echo "$(date): Contains qemu_args:$check_start_vm in ${IMG_PATH}/my.cfg, will use no OVMF my.cfg" >> $syzkaller_log
+    echo "$(date): Contains qemu_args & OVMF:$check_start_vm in ${IMG_PATH}/my.cfg, will use no OVMF my.cfg" >> $syzkaller_log
     echo "wget $cfg_no_ovmf_link -O ${IMG_PATH}/my.cfg" >> $syzkaller_log
     wget "$cfg_no_ovmf_link" -O "${IMG_PATH}/my.cfg"
   fi
