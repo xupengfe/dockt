@@ -3,13 +3,14 @@
 	"http": "0.0.0.0:56741",
 	"workdir": "/root/syzkaller/workdir",
 	"kernel_obj": "/tmp/syzkaller/os.linux.intelnext.kernel",
-	"image": "/root/image/centos8.img",
+	"image": "/root/image/centos9.img",
 	"sshkey": "/root/image/id_rsa_cent",
 	"syzkaller": "/root/syzkaller",
 	"procs": 8,
 	"type": "qemu",
 	"vm": {
 		"count": 4,
+		"qemu_args": "-cpu host -net nic,model=e1000 -enable-kvm",
 		"kernel": "/root/image/bzImage_514rc6i0819_93715b26deb1783677a6c6db9951930caebc698b",
 		"cpu": 2,
 		"mem": 2048
