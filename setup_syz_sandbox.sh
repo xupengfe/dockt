@@ -519,7 +519,7 @@ get_image() {
   cd /root/
   rm -rf image.tar.gz
   # Clean the old images to save the disk space
-  rm -rf "${IMG_PATH}/centos8*img"
+  rm -rf ${IMG_PATH}/centos8*img
   wget http://xpf-desktop.sh.intel.com/syzkaller/image.tar.gz
   tar -xvf image.tar.gz
 
