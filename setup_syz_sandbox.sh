@@ -112,11 +112,18 @@ get_repo() {
 
 install_packages() {
   local httpd_result=""
+  local check_selinux=""
 
   [[ "$IGNORE" -eq 1 ]] && {
     echo "IGNORE:$IGNORE is 1, will ignore rpm installation"
     return 0
   }
+
+  check_selinux=$(grep SELINUX=enforcing /etc/sysconfig/selinux | grep -v "^#")
+  if [[ -n "$check_selinux" ]]; then
+    sed -i s/SELINUX=enforcing/SELINUX=disabled/g  /etc/sysconfig/selinux
+    setenforce 0
+  fi
 
   echo "Install useful packages:" >> $syzkaller_log
   echo "yum -y install glibc-devel.i686 glibc-devel"
