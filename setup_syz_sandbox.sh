@@ -6,13 +6,15 @@ TAG_ORIGIN="/opt/tag_origin"
 SCOM_FILE="/opt/start_commit"
 syzkaller_log="/root/setup_syzkaller.log"
 IMG_PATH="/root/image"
-IMAGE="${IMG_PATH}/centos8.img"
+IMAGE="${IMG_PATH}/centos9.img"
 QEMU_NEXT="https://github.com/intel-innersource/virtualization.hypervisors.server.vmm.qemu-next"
 INTEL_NEXT="https://github.com/intel-innersource/os.linux.intelnext.kernel.git"
 KERNEL_PATH="/root/os.linux.intelnext.kernel"
 DEFAULT_PORT="10022"
 HOME_PATH=$(echo $HOME)
-IMAGE2="${IMG_PATH}/centos8_2.img"
+#IMAGE2="${IMG_PATH}/centos8_2.img"
+IMAGE9_2="${IMG_PATH}/centos9_2.img"
+IMAGE9_3="${IMG_PATH}/centos9_3.img"
 BZ_PATH="/root/bzimage_bisect"
 SCAN_SCRIPT="scan_bisect.sh"
 SCAN_SRV="scansyz.service"
@@ -516,16 +518,19 @@ get_image() {
   echo "Get the image"
   cd /root/
   rm -rf image.tar.gz
+  # Clean the old images to save the disk space
+  rm -rf "${IMG_PATH}/centos8*img"
   wget http://xpf-desktop.sh.intel.com/syzkaller/image.tar.gz
   tar -xvf image.tar.gz
 
   cd ${IMG_PATH}
+
   # centos8.img is for syzkaller
   # centos8_2.img is for issue bisect
-  cp -rf ${IMG_PATH}/centos8.img ${IMG_PATH}/centos8_2.img
+  cp -rf "$IMAGE" "$IMAGE9_2"
   # centos8_2.img is broken sometimes when reproduce issue
   # Use centos8_3.img backup one to recover centos8_2.img
-  cp -rf ${IMG_PATH}/centos8.img ${IMG_PATH}/centos8_3.img
+  cp -rf "$IMAGE" "$IMAGE9_3"
   if [[ -e "${HOME_PATH}/.ssh/id_rsa.pub" ]]; then
     echo "${HOME_PATH}/.ssh/id_rsa.pub exist, no need regenerate it"
     echo "${HOME_PATH}/.ssh/id_rsa.pub exist, no need regenerate it" >> $syzkaller_log
