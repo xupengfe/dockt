@@ -290,6 +290,8 @@ install_usbredir() {
       echo "Access usbredir failed"
       echo "Access usbredir failed" >> "$syzkaller_log"
     }
+    pip3 install meson
+    git checkout -f usbredir-0.12.0
     meson build
     ninja -C build install
     pkg-config --modversion libusbredirparser-0.5
