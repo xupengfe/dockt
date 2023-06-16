@@ -522,7 +522,7 @@ get_image() {
   [[ -z "$img" ]] || {
     # Old centos9.img is 8,5G size and it boot up slowly, will use new 8.2G one
     check_img=$(ls -ltra ${IMG_PATH}/centos9.img | grep "9126805504")
-    if [[ -z "$check_img" ]]; then
+    if [[ -n "$check_img" ]]; then
       echo "Old centos9.img 8.5G:$check_img, will reinstall it." >> $syzkaller_log
     else
       echo "$img exist and not 8.5G(9126805504) old one:$check_img, don't need to reinstall image." >> $syzkaller_log
