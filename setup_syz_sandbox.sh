@@ -279,7 +279,9 @@ install_ninja() {
       echo "Access ninja failed" >> "$syzkaller_log"
     }
     ./configure.py --bootstrap
-    sudo cp ninja /usr/local/bin/
+    # Not /usr/local/bin/, use /usr/bin instead
+    # sudo cp ninja /usr/local/bin/
+    sudo cp ninja /usr/bin/
   else
     echo "ninja is installed, no need to reinstall." >> "$syzkaller_log"
   fi
