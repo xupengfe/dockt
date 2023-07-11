@@ -278,6 +278,8 @@ install_ninja() {
       echo "Access ninja failed"
       echo "Access ninja failed" >> "$syzkaller_log"
     }
+    # Update in 2023.7
+    git checkout -f 36843d387cb0621c1a288179af223d4f1410be73
     ./configure.py --bootstrap
     # Not /usr/local/bin/, use /usr/bin instead
     # sudo cp ninja /usr/local/bin/
