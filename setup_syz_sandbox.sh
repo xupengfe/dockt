@@ -302,6 +302,8 @@ install_usbredir() {
       echo "Access usbredir failed" >> "$syzkaller_log"
     }
     pip3 install meson
+    # /usr/local/bin/ is not in the default PATH in CentOS9
+    cp -rf /usr/local/bin/meson  /bin/
     git checkout -f usbredir-0.12.0
     meson build
     ninja -C build install
@@ -408,6 +410,8 @@ setup_qemu() {
     echo "pwd:$(pwd)"
     echo "After install usbredir pwd:$(pwd)" >> "$syzkaller_log"
   }
+  # /usr/local/bin/ is not in the default PATH in CentOS9 even in ~/.bashrc
+  cp -rf /usr/local/bin/meson  /bin/
   # yum -y install libslirp-devel.x86_64    // installed in previous step
   ../configure --target-list=x86_64-softmmu --enable-kvm --enable-vnc --enable-gtk --enable-sdl --enable-usb-redir --enable-slirp
   make
