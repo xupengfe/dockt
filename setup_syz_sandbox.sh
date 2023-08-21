@@ -113,6 +113,7 @@ get_repo() {
 install_packages() {
   local httpd_result=""
   local check_selinux=""
+  local cmdline_selinux=""
 
   [[ "$IGNORE" -eq 1 ]] && {
     echo "IGNORE:$IGNORE is 1, will ignore rpm installation"
@@ -124,6 +125,11 @@ install_packages() {
     sed -i s/SELINUX=enforcing/SELINUX=disabled/g  /etc/sysconfig/selinux
     setenforce 0
   fi
+  cmdline_selinux=$(cat /proc/cmdline | grep selinux)
+  [[ -z "$cmdline_selinux" ]] && {
+    echo "cmdline doesn't disable selinux! Will disable selinux!" >> $syzkaller_log
+    grubby --update-kernel ALL --args selinux=0
+  }
 
   echo "Install useful packages:" >> $syzkaller_log
   echo "yum -y install glibc-devel.i686 glibc-devel"
