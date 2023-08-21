@@ -125,7 +125,7 @@ install_packages() {
     sed -i s/SELINUX=enforcing/SELINUX=disabled/g  /etc/sysconfig/selinux
     setenforce 0
   fi
-  cmdline_selinux=$(cat /proc/cmdline | grep selinux)
+  cmdline_selinux=$(grep selinux /proc/cmdline)
   [[ -z "$cmdline_selinux" ]] && {
     echo "cmdline doesn't disable selinux! Will disable selinux!" >> $syzkaller_log
     grubby --update-kernel ALL --args selinux=0
