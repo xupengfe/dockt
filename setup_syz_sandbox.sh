@@ -422,6 +422,7 @@ setup_qemu() {
   ../configure --target-list=x86_64-softmmu --enable-kvm --enable-vnc --enable-gtk --enable-sdl --enable-usb-redir --enable-slirp
   make
   make install
+  cp -rf qemu-system-x86_64  /usr/local/bin/
   qemu_version_check
 }
 
