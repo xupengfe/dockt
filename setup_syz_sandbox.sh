@@ -514,6 +514,12 @@ check_img_update() {
     echo "wget $cfg_no_ovmf_link -O ${IMG_PATH}/my.cfg" >> $syzkaller_log
     wget "$cfg_no_ovmf_link" -O "${IMG_PATH}/my.cfg"
   fi
+
+  # In any situation, don't use quiet to boot vm to miss the dmesg in serial log
+  sed -i s/quiet//g ${IMG_PATH}/my.cfg
+  sed -i s/quiet//g ${IMG_PATH}/start1.sh
+  sed -i s/quiet//g ${IMG_PATH}/start2.sh
+  sed -i s/quiet//g ${IMG_PATH}/start3.sh
 }
 
 get_image() {
@@ -534,6 +540,7 @@ get_image() {
 
   img=$(ls "$IMAGE" 2>/dev/null)
   local check_img=""
+  # img is not NULL, so update the img folder
   [[ -z "$img" ]] || {
     # Old centos9.img is 8,5G size and it boot up slowly, will use new 8.2G one
     check_img=$(ls -ltra ${IMG_PATH}/centos9.img | grep "9126805504")
