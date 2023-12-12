@@ -84,6 +84,9 @@ get_repo() {
   local bz_git_check=""
 
   date +%Y-%m-%d_%H:%M:%S >> $syzkaller_log
+  # Syzkaller maybe do fuzzing more than 10days
+  echo "sed -i s/10d/32d/g /usr/lib/tmpfiles.d/tmp.conf" >> "$syzkaller_log"
+  sed -i s/10d/32d/g /usr/lib/tmpfiles.d/tmp.conf
   check_syzkaller
   yum install -y git
 
