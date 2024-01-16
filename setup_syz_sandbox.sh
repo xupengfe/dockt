@@ -749,6 +749,11 @@ next_to_do() {
 }
 
 main() {
+  [[ -z "$DEST" ]] && {
+    echo "DEST:$DEST is null use default:$DEFAULT_DEST"
+    echo "DEST:$DEST is null use default:$DEFAULT_DEST" >> "$syzkaller_log"
+    DEST=$DEFAULT_DEST
+  }
   echo "$(date +%Y-%m-%d_%H:%M:%S):SRC:$SOURCE|FORCE:$FORCE|IGN:$IGNORE|TAG:$TAG|KER:$KER_PATH|base:$START_COMMIT|$DEST|$NEXT_BASE_TAG"
   echo "====================" >> "$syzkaller_log"
   echo "$(date +%Y-%m-%d_%H:%M:%S):SRC:$SOURCE|FORCE:$FORCE|IGN:$IGNORE|TAG:$TAG|KER:$KER_PATH|base:$START_COMMIT|$DEST|$NEXT_BASE_TAG" >> "$syzkaller_log"
