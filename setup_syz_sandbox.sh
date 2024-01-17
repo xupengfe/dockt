@@ -729,8 +729,8 @@ next_to_do() {
   if [[ -n "$TAG" ]]; then
     if [[ -n "$KER_PATH" ]]; then
       if [[ -n "$START_COMMIT" ]]; then
-        echo "/root/bzimage_bisect/run_syzkaller.sh -e $TAG -k $KER_PATH -b $START_COMMIT -d $DEST -n $NEXT_BASE_TAG" >> "$syzkaller_log"
-        /root/bzimage_bisect/run_syzkaller.sh -e "$TAG" -k "$KER_PATH" -b "$START_COMMIT" -d "$DEST" -n "$NEXT_BASE_TAG"
+        echo "/root/bzimage_bisect/run_syzkaller.sh -e $TAG -k $KER_PATH -b $START_COMMIT -d $DEST -n $NEXT_BASE_TAG" -p "$PARM" >> "$syzkaller_log"
+        /root/bzimage_bisect/run_syzkaller.sh -e "$TAG" -k "$KER_PATH" -b "$START_COMMIT" -d "$DEST" -n "$NEXT_BASE_TAG" -p "$PARM"
       else
         echo  "KER:$KER_PATH contain value but no START_COMMIT:$START_COMMIT"
         echo  "KER:$KER_PATH contain value but no START_COMMIT:$START_COMMIT" >> "$syzkaller_log"
@@ -781,7 +781,8 @@ main() {
 : "${SOURCE:=o}"
 : "${IGNORE:=0}"
 : "${FORCE:=0}"
-while getopts :s:f:i:t:k:b:d:n:h arg; do
+: "${PARM:=0}"
+while getopts :s:f:i:t:k:b:d:n:p:h arg; do
   case $arg in
     s)
       SOURCE=$OPTARG
@@ -817,6 +818,9 @@ while getopts :s:f:i:t:k:b:d:n:h arg; do
       # next base commit, for example v6.1-intel-next -> v6.1 -> v5.11(next)
       # Next base commit or next base tag is both ok.
       NEXT_BASE_TAG=$OPTARG
+      ;;
+    p)
+      PARM=$OPTARG
       ;;
     h)
       usage
