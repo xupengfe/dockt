@@ -471,7 +471,7 @@ check_img_update() {
   local check_start_vm=""
   local my_cfg_link="https://raw.githubusercontent.com/xupengfe/dockt/main/my.cfg"
   local cfg_no_ovmf_link="https://raw.githubusercontent.com/xupengfe/dockt/main/my.cfg_no_OVMF"
-  local start_vm_path="http://xpf-desktop.sh.intel.com/syzkaller/image/"
+  local start_vm_path="http://xpf.sh.intel.com/syzkaller/image/"
   local ovmf_link="https://github.com/xupengfe/dockt/raw/main/OVMF_CODE.fd"
 
   [[ -e "${IMG_PATH}/my.cfg" ]] || {
