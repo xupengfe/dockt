@@ -139,6 +139,8 @@ install_packages() {
   yum -y install glibc-devel.i686 glibc-devel
   echo "yum -y install gcc-c++"
   yum -y install gcc-c++
+  yum -y install perl.x86_64
+  yum -y install dwarves.x86_64   libdwarves1.x86_64
   yum -y install make
   echo "yum -y install go"
   yum -y install go
